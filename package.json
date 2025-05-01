@@ -11,11 +11,14 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^9.25.1",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/mongoose": "^5.11.96",
-    "@types/node": "^22.15.3"
+    "@types/node": "^22.15.3",
+    "eslint": "^9.25.1",
+    "typescript-eslint": "^8.31.1"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
-import testRoutes from './routes/testRoutes';
+import userRoutes from './routes/user';
 
 import { errorHandler } from './middlewares/errorHandler';
 
@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/test', testRoutes);
+app.use('/api/users', userRoutes);
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {
@@ -31,6 +31,6 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // Error Handler
-app.use(errorHandler);
+//app.use(errorHandler);
 
 export default app;

@@ -1,4 +1,4 @@
-import { Schema, Types, model } from "mongoose";
+import { Document, Schema, Types, model } from "mongoose";
 import bcrypt from "bcrypt";
 
 interface IApiKey {
@@ -10,9 +10,9 @@ interface IApiKey {
 const apiKeySchema = new Schema<IApiKey>({
     key: { type: String },
     isActive: { type: Boolean, default: true },
-    user: { type: Schema.Types.ObjectId, ref: 'User' }
+    user: { type: Schema.Types.ObjectId, ref: 'User' },
 }, {
-    timestamps: true
+    timestamps: true,
 });
 
 apiKeySchema.pre('save', async function(): Promise<void> {
@@ -21,17 +21,11 @@ apiKeySchema.pre('save', async function(): Promise<void> {
     }
 });
 
-apiKeySchema.methods.toJSON = function () {
-    const userStatsObject = this.toObject();
-
-    delete userStatsObject._id;
-    delete userStatsObject.key;
-    delete userStatsObject.createdAt;
-    delete userStatsObject.updatedAt;
-    delete userStatsObject.__v;
-
-    return userStatsObject;
-}
+apiKeySchema.methods.toJSON = function (this: Document & IApiKey): object {
+    const { isActive, user } = this.toObject() as Document & IApiKey;
+    
+    return { isActive, user };
+};
 
 const ApiKey = model<IApiKey>('ApiKey', apiKeySchema);
 

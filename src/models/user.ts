@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Document, Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 
 import { AppError } from "../middlewares/errorHandler";
@@ -14,24 +14,24 @@ const userSchema = new Schema<IUser>({
     email: { type: String, required: true },
     password: { type: String, required: true },
 }, {
-    timestamps: true
+    timestamps: true,
 });
 
 // Bind relationship w/ ApiKey
 userSchema.virtual('apiKey', {
     ref: 'ApiKey',
     localField: '_id',
-    foreignField: 'user'
+    foreignField: 'user',
 });
 
 userSchema.pre('save', async function (): Promise<void> {
     if (this.password && this.isModified('password')) {
-        this.password = await bcrypt.hash(this.password, 8)
+        this.password = await bcrypt.hash(this.password, 8);
     }
-})
+});
 
-userSchema.statics.authenticate = async (email, password) => {
-    const user = await User.findOne({ email })
+userSchema.statics.authenticate = async function (email: string, password: string): Promise<Document & IUser> {
+    const user = await User.findOne({ email });
 
     if (!user) {
         const error = new Error('Unable to login') as AppError;
@@ -39,7 +39,7 @@ userSchema.statics.authenticate = async (email, password) => {
         throw error;
     }
 
-    const isMatch: boolean = await bcrypt.compare(password, user.password)
+    const isMatch: boolean = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
         const error = new Error('Unable to login') as AppError;
@@ -47,20 +47,14 @@ userSchema.statics.authenticate = async (email, password) => {
         throw error;
     }
 
-    return user
-}
+    return user;
+};
 
-userSchema.methods.toJSON = function () {
-    const userStatsObject = this.toObject()
+userSchema.methods.toJSON = function (this: Document & IUser): object {
+    const { username, email } = this.toObject() as Document & IUser;
 
-    delete userStatsObject._id
-    delete userStatsObject.password
-    delete userStatsObject.createdAt
-    delete userStatsObject.updatedAt
-    delete userStatsObject.__v
-
-    return userStatsObject
-}
+    return { username, email };
+};
 
 const User = model<IUser>('User', userSchema);
 

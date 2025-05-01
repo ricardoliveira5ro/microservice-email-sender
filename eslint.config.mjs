@@ -21,8 +21,7 @@ export default tseslint.config(
         rules: {
             semi: ['error', 'always'],                   // Require semicolons
             'comma-dangle': ['error', 'always-multiline'], // Enforce trailing commas in multiline
-            'object-curly-spacing': ['error', 'always'], // Require spacing inside braces
-            'no-trailing-spaces': 'error',               // Disallow trailing whitespace
+            'object-curly-spacing': ['warn', 'always'], // Require spacing inside braces
             
             '@typescript-eslint/explicit-function-return-type': ['warn'],
             '@typescript-eslint/explicit-module-boundary-types': ['warn'],

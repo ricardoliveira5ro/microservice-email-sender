@@ -31,6 +31,6 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // Error Handler
-//app.use(errorHandler);
+app.use(errorHandler);
 
 export default app;

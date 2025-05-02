@@ -8,14 +8,38 @@ const router = Router();
 
 router.post('/signup', async (req: Request, res: Response) => {
     const user = new User(req.body);
-    
-    const tmpKey = crypto.randomBytes(32).toString("hex");
-    const apiKey = new ApiKey({ key: tmpKey, user: user._id });
 
     await user.save();
+    
+    res.send({ user });
+});
+
+router.post('/login', async (req: Request, res: Response) => {
+    const { email, password } = req.body as { email: string; password: string };
+    const user = await User.authenticate(email, password);
+    
+    res.send({ user });
+});
+
+router.get('/generateApiKey', async (req: Request, res: Response) => {
+    const { email, password } = req.body as { email: string; password: string };
+    const user = await User.authenticate(email, password);
+
+    const tmpKey = crypto.randomBytes(32).toString("hex");
+    const apiKey = new ApiKey({ key: tmpKey, user: user });
+
     await apiKey.save();
     
-    res.send({ user, apiKey: tmpKey });
+    res.send({ apiKey: tmpKey });
+});
+
+router.post('/invalidateApiKey', async (req: Request, res: Response) => {
+    const { email, password, id } = req.body as { email: string; password: string, id: string };
+    const user = await User.authenticate(email, password);
+
+    await ApiKey.findByIdAndUpdate(id, { $set: { isActive: false } });
+    
+    res.send({ user });
 });
 
 export default router;

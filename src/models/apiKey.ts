@@ -22,9 +22,9 @@ apiKeySchema.pre('save', async function(): Promise<void> {
 });
 
 apiKeySchema.methods.toJSON = function (this: Document & IApiKey): object {
-    const { isActive, user } = this.toObject() as Document & IApiKey;
+    const { _id, isActive, user } = this.toObject() as Document & IApiKey;
     
-    return { isActive, user };
+    return { _id, isActive, user };
 };
 
 const ApiKey = model<IApiKey>('ApiKey', apiKeySchema);

@@ -1,24 +1,51 @@
-import { Document, Schema, model } from "mongoose";
+import { Document, Schema, Model, model } from "mongoose";
 import bcrypt from "bcrypt";
+import { isEmail, isStrongPassword } from "validator";
 
-import { AppError } from "../middlewares/errorHandler";
+import AppError from "../utils/errors/AppError";
 
-interface IUser {
+export interface IUser {
     username: string;
     email: string;
     password: string;
 };
 
-const userSchema = new Schema<IUser>({
-    username: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
+interface IUserModel extends Model<IUser> {
+    authenticate(email: string, password: string): Promise<Document & IUser>;
+};
+
+const userSchema = new Schema<IUser, IUserModel>({
+    username: { 
+        type: String, 
+        unique: true, 
+        required: true,
+        trim: true,
+    },
+    email: { 
+        type: String, 
+        unique: true, 
+        required: true, 
+        trim: true,
+        validate: {
+            validator: (value): boolean => isEmail(value as string),
+            message: 'Email is invalid',
+        },
+    },
+    password: { 
+        type: String, 
+        required: true,
+        trim: true,
+        validate: {
+            validator: (value): boolean => isStrongPassword(value as string, { minLength: 7, minNumbers: 0, minLowercase: 0, minUppercase: 1, minSymbols: 1 }),
+            message: 'Password is invalid',
+        },
+    },
 }, {
     timestamps: true,
 });
 
 // Bind relationship w/ ApiKey
-userSchema.virtual('apiKey', {
+userSchema.virtual('apiKeys', {
     ref: 'ApiKey',
     localField: '_id',
     foreignField: 'user',
@@ -30,32 +57,28 @@ userSchema.pre('save', async function (): Promise<void> {
     }
 });
 
-userSchema.statics.authenticate = async function (email: string, password: string): Promise<Document & IUser> {
+userSchema.static('authenticate', async function authenticate (email: string, password: string): Promise<Document & IUser> {
     const user = await User.findOne({ email });
 
     if (!user) {
-        const error = new Error('Unable to login') as AppError;
-        error.status = 401;
-        throw error;
+        throw new AppError('Unable to login', 401);
     }
 
     const isMatch: boolean = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
-        const error = new Error('Unable to login') as AppError;
-        error.status = 401;
-        throw error;
+        throw new AppError('Unable to login', 401);
     }
 
     return user;
-};
+});
 
 userSchema.methods.toJSON = function (this: Document & IUser): object {
-    const { username, email } = this.toObject() as Document & IUser;
+    const { _id, username, email } = this.toObject() as Document & IUser;
 
-    return { username, email };
+    return { _id, username, email };
 };
 
-const User = model<IUser>('User', userSchema);
+const User = model<IUser, IUserModel>('User', userSchema);
 
 export default User;

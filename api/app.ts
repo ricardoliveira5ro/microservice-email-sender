@@ -6,7 +6,13 @@ import emailRoutes from './routes/email';
 
 import { errorHandler } from './middlewares/errorHandler';
 
+import { connectDB } from './db/connection';
+
 const app = express();
+
+connectDB().catch((err: unknown) => {
+    console.error('Failed to connect to DB:', err);
+});
 
 app.use(cors());
 app.use(express.json());

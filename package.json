@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon api/server.ts",
     "lint": "npx eslint ."
   },
   "author": "",
@@ -36,6 +36,7 @@
     "nodemailer": "^6.10.1",
     "nodemon": "^3.1.10",
     "npm": "^10.9.2",
+    "serverless-http": "^3.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "validator": "^13.15.0"

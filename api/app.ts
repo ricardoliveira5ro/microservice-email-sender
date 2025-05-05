@@ -2,16 +2,24 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 
 import userRoutes from './routes/user';
+import emailRoutes from './routes/email';
 
 import { errorHandler } from './middlewares/errorHandler';
 
+import { connectDB } from './db/connection';
+
 const app = express();
+
+connectDB().catch((err: unknown) => {
+    console.error('Failed to connect to DB:', err);
+});
 
 app.use(cors());
 app.use(express.json());
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/emails', emailRoutes);
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {

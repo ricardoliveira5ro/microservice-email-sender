@@ -1,3 +1,5 @@
+// ------------------------- Run locally ----------------------- //
+
 import app from './app';
 import config from './config/config';
 import { connectDB } from './db/connection';

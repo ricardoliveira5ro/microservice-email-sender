@@ -33,11 +33,12 @@ app.get('/api/health', (req: Request, res: Response) => {
     }
 });
 
+// Next js Client Route
 const staticPath = path.join(process.cwd(), 'src/client/out');
 
 app.use(express.static(staticPath));
 
-app.get(/(.*)/, (req, res) => {
+app.get(/(.*)/, (req: Request, res: Response) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
 

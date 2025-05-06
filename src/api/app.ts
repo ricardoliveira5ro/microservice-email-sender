@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import path from 'path';
 
 import userRoutes from './routes/user';
 import emailRoutes from './routes/email';
@@ -30,6 +31,14 @@ app.get('/api/health', (req: Request, res: Response) => {
         healthCheck.message = error as string;
         res.status(503).send(healthCheck);
     }
+});
+
+const staticPath = path.join(process.cwd(), 'src/client/out');
+
+app.use(express.static(staticPath));
+
+app.get(/(.*)/, (req, res) => {
+  res.sendFile(path.join(staticPath, 'index.html'));
 });
 
 // Error Handler

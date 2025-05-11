@@ -3,12 +3,12 @@ import sendEmail from '../services/email';
 
 const router = Router();
 
-router.post('/send-email', (req: Request, res: Response) => {
+router.post('/send-email', async (req: Request, res: Response) => {
     const { recipients, subject, text, category } = req.body as { recipients: [], subject: string, text: string, category: string };
 
-    sendEmail(recipients, subject, text, category);
-    
-    res.send({ message: "OK" });
+    await sendEmail(recipients, subject, text, category);
+
+    res.send({ message: "Email sent successfully" });
 });
 
 export default router;

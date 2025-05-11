@@ -4,9 +4,11 @@ import sendEmail from '../services/email';
 const router = Router();
 
 router.post('/send-email', (req: Request, res: Response) => {
-    sendEmail();
+    const { recipients, subject, text, category } = req.body as { recipients: [], subject: string, text: string, category: string };
+
+    sendEmail(recipients, subject, text, category);
     
-    res.send({  });
+    res.send({ message: "OK" });
 });
 
 export default router;

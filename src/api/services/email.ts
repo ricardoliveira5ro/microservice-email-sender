@@ -2,31 +2,21 @@ import { MailtrapClient } from "mailtrap";
 
 import config from "../config/config";
 
-export default function sendEmail(): void {
-    const client = new MailtrapClient({
-        token: config.mailtrapToken,
-        sandbox: true,
-        testInboxId: 3666623,
-    });
+export default function sendEmail(recipients: [], subject: string, text: string, category: string): void {
+    const client = new MailtrapClient({ token: config.mailtrapToken });
 
     const sender = {
-        email: "test@demomailtrap.co",
-        name: "Mailtrap Test",
+        email: "info@email-sender.solutions",
+        name: "Email Sender Solutions",
     };
-
-    const recipients = [
-        {
-          email: "someone@gmail.com",
-        },
-    ];
 
     client
         .send({
             from: sender,
             to: recipients,
-            subject: "You are awesome!",
-            text: "Congrats for sending test email with Mailtrap!",
-            category: "Integration Test",
+            subject: subject,
+            text: text,
+            category: category,
         })
         .then(console.log, console.error);
 };

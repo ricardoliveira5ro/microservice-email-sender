@@ -4,17 +4,22 @@ import crypto from 'crypto';
 import User from '../models/user';
 import ApiKey from '../models/apiKey';
 
+import { userInvalidateKeyValidator, userLoginValidator, userSignUpValidator } from '../validators/userValidators';
+
 const router = Router();
 
 router.post('/signup', async (req: Request, res: Response) => {
-    const user = new User(req.body);
+    userSignUpValidator.parse(req.body);
 
+    const user = new User(req.body);
     await user.save();
     
     res.send({ user });
 });
 
 router.post('/login', async (req: Request, res: Response) => {
+    userLoginValidator.parse(req.body);
+
     const { email, password } = req.body as { email: string; password: string };
     const user = await User.authenticate(email, password);
     
@@ -22,6 +27,8 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 router.get('/generateApiKey', async (req: Request, res: Response) => {
+    userLoginValidator.parse(req.body);
+    
     const { email, password } = req.body as { email: string; password: string };
     const user = await User.authenticate(email, password);
 
@@ -34,6 +41,8 @@ router.get('/generateApiKey', async (req: Request, res: Response) => {
 });
 
 router.post('/invalidateApiKey', async (req: Request, res: Response) => {
+    userInvalidateKeyValidator.parse(req.body);
+
     const { email, password, id } = req.body as { email: string; password: string, id: string };
     const user = await User.authenticate(email, password);
 

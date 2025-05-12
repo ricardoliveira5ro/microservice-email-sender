@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { MongoServerError } from 'mongodb';
 import { Error as MongooseError } from 'mongoose';
+import { ZodError } from 'zod';
 
 import AppError from '../utils/errors/AppError';
 import config from '../config/config';
@@ -44,9 +45,17 @@ const validationError = (err: MongooseError.ValidationError): AppError => {
     return new AppError (message, 400);
 };
 
+const requestValidationError = (err: ZodError): AppError => {
+    const message = err.errors.map(e => `${e.path[0].toString()}: ${e.message}`)
+                                .join(' -- && -- ');
+
+    return new AppError (message, 400);
+};
+
 export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction): void => {
     if (err instanceof MongoServerError) err = databaseError(err);
     if (err instanceof MongooseError.ValidationError) err = validationError(err);
+    if (err instanceof ZodError) err = requestValidationError(err);
 
     if (config.nodeEnv === "development") {
         developmentError(err, res);

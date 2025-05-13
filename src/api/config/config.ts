@@ -7,6 +7,7 @@ interface Config {
     nodeEnv: string;
     dbConnectionString: string;
     mailtrapToken: string;
+    redisURL: string;
 };
 
 const config: Config = {
@@ -14,6 +15,7 @@ const config: Config = {
     nodeEnv: process.env.NODE_ENV ?? 'development',
     dbConnectionString: process.env.DB_CONNECTION_STRING ?? 'mongodb://127.0.0.1:27017/emailSenderLocalDB',
     mailtrapToken: process.env.MAILTRAP_TOKEN ?? '',
+    redisURL: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
 };
 
 export default config;

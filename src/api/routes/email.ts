@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 
-import sendEmail from '../services/email';
 import { emailSendingValidator } from '../validators/emailValidators';
+import { jobQueue } from '../queue/connection';
 
 const router = Router();
 
@@ -10,9 +10,18 @@ router.post('/send-email', async (req: Request, res: Response) => {
 
     const { recipients, subject, text, category } = req.body as { recipients: [], subject: string, text: string, category: string };
 
-    await sendEmail(recipients, subject, text, category);
+    const jobOptions = {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 1000,
+        },
+        removeOnComplete: true,
+    };
 
-    res.send({ message: "Email sent successfully" });
+    await jobQueue.add('send-email', { recipients, subject, text, category }, jobOptions);
+
+    res.send({ message: "Email queued for delivery" });
 });
 
 export default router;

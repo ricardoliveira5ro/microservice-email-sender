@@ -34,11 +34,22 @@ router.post('/webhooks', (req: Request, res: Response) => {
         return;
     }
 
-    const { event, recipient, message_id, timestamp, status } = req.body as { event: string, recipient: string, message_id: string, timestamp: string, status: string };
-    console.log(`Webhook ${event}: To ${recipient} with id ${message_id} at ${timestamp} as ${status.toUpperCase()}`);
-    // Update database / Logging
+    const { events } = req.body as { events: MailtrapEvent[] };
+    for (const e of events) {
+        const { event, email, message_id, timestamp } = e;
+        
+        console.log(`Webhook ${event}: To ${email} with id ${message_id} at ${new Date(timestamp * 1000).toISOString()}`);
+        // Update database / Logging
+    }
 
     res.send({ message: "Received" });
 });
+
+interface MailtrapEvent {
+    event: string,
+    email: string;
+    message_id: string;
+    timestamp: number;
+}
 
 export default router;

@@ -8,7 +8,13 @@ export function startEmailWorker(): Worker {
             const { recipients, subject, text, category } = job.data as { recipients: [], subject: string, text: string, category: string };
             await sendEmail(recipients, subject, text, category);
         }
-    }, { connection: redisConnection });
+    }, { 
+        connection: redisConnection, 
+        limiter: {
+            max: 10,
+            duration: 1000,
+        },
+    });
 
     worker.on('completed', (job: Job) => {
         console.log(`Job ${job.id ?? 'unknown'} completed successfully`);

@@ -4,6 +4,7 @@ import { emailSendingValidator } from '../validators/emailValidators';
 import { jobQueue } from '../queue/connection';
 import { apiKeyAuthorizationMiddleware } from '../middlewares/apiKeyAuthorization';
 import config from '../config/config';
+import Email from '../models/email';
 
 const router = Router();
 
@@ -36,20 +37,25 @@ router.post('/webhooks', (req: Request, res: Response) => {
 
     const { events } = req.body as { events: MailtrapEvent[] };
     for (const e of events) {
-        const { event, email, message_id, timestamp } = e;
+        console.log(e.message_id);
+
+        //const email = await Email.findOne({ messageId: e.message_id });
+
         
-        console.log(`Webhook ${event}: To ${email} with id ${message_id} at ${new Date(timestamp * 1000).toISOString()}`);
-        // Update database / Logging
     }
 
     res.send({ message: "Received" });
 });
 
 interface MailtrapEvent {
-    event: string,
-    email: string;
+    event: string;
     message_id: string;
+    event_id: string;
     timestamp: number;
+    bounce_category: string;
+    response: string;
+    reason: string;
+    user_agent: string;
 }
 
 export default router;

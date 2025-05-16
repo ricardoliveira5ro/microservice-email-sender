@@ -27,7 +27,7 @@ router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, r
     res.send({ message: "Email queued for delivery" });
 });
 
-router.post('/webhooks', (req: Request, res: Response) => {
+router.post('/webhooks', async (req: Request, res: Response) => {
     const token = req.query.token as string;
 
     if (token !== config.mailtrapToken) {
@@ -37,11 +37,18 @@ router.post('/webhooks', (req: Request, res: Response) => {
 
     const { events } = req.body as { events: MailtrapEvent[] };
     for (const e of events) {
-        console.log(e.message_id);
+        const filter = { messageId: e.message_id };
+        const update = {
+            status: e.event,
+            eventId: e.event_id,
+            timestamp: e.timestamp,
+            bounceCategory: e.bounce_category || undefined,
+            response: e.response || undefined,
+            reason: e.reason || undefined,
+            userAgent: e.user_agent || undefined,
+        };
 
-        //const email = await Email.findOne({ messageId: e.message_id });
-
-        
+        await Email.findOneAndUpdate(filter, update, { new: true });
     }
 
     res.send({ message: "Received" });

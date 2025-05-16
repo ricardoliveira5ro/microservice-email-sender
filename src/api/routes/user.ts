@@ -37,7 +37,7 @@ router.get('/generateApiKey', async (req: Request, res: Response) => {
 
     await apiKey.save();
     
-    res.send({ apiKey: tmpKey });
+    res.send({ authId: apiKey.id as string, apiKey: tmpKey });
 });
 
 router.post('/invalidateApiKey', async (req: Request, res: Response) => {

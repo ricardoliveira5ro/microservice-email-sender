@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { MongoServerError } from 'mongodb';
 import { Error as MongooseError } from 'mongoose';
 import { ZodError } from 'zod';
+import { BSONError } from 'bson';
 
 import AppError from '../utils/errors/AppError';
 import config from '../config/config';
@@ -52,10 +53,13 @@ const requestValidationError = (err: ZodError): AppError => {
     return new AppError (message, 400);
 };
 
+const invalidIdError = (): AppError => new AppError('Invalid ID', 400);
+
 export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction): void => {
     if (err instanceof MongoServerError) err = databaseError(err);
     if (err instanceof MongooseError.ValidationError) err = validationError(err);
     if (err instanceof ZodError) err = requestValidationError(err);
+    if (err instanceof BSONError) err = invalidIdError();
 
     if (config.nodeEnv === "development") {
         developmentError(err, res);

@@ -34,6 +34,10 @@ app.get('/api/health', (req: Request, res: Response) => {
     }
 });
 
+app.all(/^\/api\/.*/, (req: Request, res: Response) => {
+  res.status(404).json({ message: 'API route not found' });
+});
+
 // Next js Client Route
 const staticPath = path.join(process.cwd(), 'src/client/out');
 

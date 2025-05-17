@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'crypto';
+import { ObjectId } from 'mongodb';
 
 import User from '../models/user';
 import ApiKey from '../models/apiKey';
@@ -46,7 +47,7 @@ router.post('/invalidateApiKey', async (req: Request, res: Response) => {
     const { email, password, id } = req.body as { email: string; password: string, id: string };
     const user = await User.authenticate(email, password);
 
-    await ApiKey.findByIdAndUpdate(id, { $set: { isActive: false } });
+    await ApiKey.findByIdAndUpdate(new ObjectId(id), { $set: { isActive: false } });
     
     res.send({ user });
 });

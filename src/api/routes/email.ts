@@ -13,6 +13,9 @@ router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, r
 
     const { recipients, subject, text, category } = req.body as { recipients: [], subject: string, text: string, category: string };
 
+    const email = new Email({ recipients, subject, text, category });
+    await email.save();
+
     const jobOptions = {
         attempts: 3,
         backoff: {
@@ -22,9 +25,9 @@ router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, r
         removeOnComplete: true,
     };
 
-    await jobQueue.add('send-email', { recipients, subject, text, category }, jobOptions);
+    await jobQueue.add('send-email', { emailId: email._id, recipients, subject, text, category }, jobOptions);
 
-    res.send({ message: "Email queued for delivery" });
+    res.send({ emailId: email._id, message: "Email queued for delivery" });
 });
 
 router.post('/webhooks', async (req: Request, res: Response) => {

@@ -23,7 +23,7 @@ const emailSchema = new Schema<IEmail>({
     subject: { type: String, required: true },
     text: { type: String, required: true },
     category: { type: String, required: true },
-    messageId: { type: String, required: true },
+    messageId: { type: String },
     status: { type: String, enum: ['delivery', 'bounce', 'suspension', 'unsubscribe', 'open', 'spam', 'click', 'reject'] },
     eventId: { type: String },
     timestamp: { type: Number },

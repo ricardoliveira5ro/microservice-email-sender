@@ -1,20 +1,19 @@
 import { Job, Worker } from "bullmq";
+import { ObjectId } from "mongoose";
 
 import { redisConnection } from "../queue/connection";
-import Email from "../models/email";
 import sendEmail from "../services/email";
+
+import Email from "../models/email";
 
 export function startEmailWorker(): Worker {
     const worker = new Worker('jobQueue', async (job: Job) => {
         if (job.name === 'send-email') {
-            const { recipients, subject, text, category } = job.data as { recipients: [], subject: string, text: string, category: string };
+            const { emailId, recipients, subject, text, category } = job.data as { emailId: ObjectId, recipients: [], subject: string, text: string, category: string };
             const response = await sendEmail(recipients, subject, text, category);
 
-            console.log(response);
-
             for (const msgId of response.message_ids) {
-                const email = new Email({ recipients, subject, text, category, messageId: msgId });
-                await email.save();
+                await Email.findByIdAndUpdate(emailId, { messageId: msgId });
             }
         }
     }, { 

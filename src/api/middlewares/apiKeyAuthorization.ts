@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import bcrypt from "bcrypt";
+import { ObjectId } from "mongodb";
 
 import ApiKey from "../models/apiKey";
-
-import AppError from "../utils/errors/AppError";
 import { IUser } from "../models/user";
 
+import AppError from "../utils/errors/AppError";
 
 export const apiKeyAuthorizationMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { authId, key } = req.query as { authId: string; key: string };
 
-    const apiKey = await ApiKey.findById(authId).populate('user');
+    const apiKey = await ApiKey.findById(new ObjectId(authId)).populate('user');
     if (!apiKey) {
         next(new AppError("Invalid API Key", 401));
         return;

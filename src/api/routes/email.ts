@@ -1,10 +1,12 @@
 import { Router, Request, Response } from 'express';
+import { ObjectId } from 'mongodb';
 
 import { emailSendingValidator } from '../validators/emailValidators';
 import { jobQueue } from '../queue/connection';
 import { apiKeyAuthorizationMiddleware } from '../middlewares/apiKeyAuthorization';
 import config from '../config/config';
 import Email from '../models/email';
+import AppError from '../utils/errors/AppError';
 
 const router = Router();
 
@@ -28,6 +30,22 @@ router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, r
     await jobQueue.add('send-email', { emailId: email._id, recipients, subject, text, category }, jobOptions);
 
     res.send({ emailId: email._id, message: "Email queued for delivery" });
+});
+
+router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const email = await Email.findById(new ObjectId(id));
+
+    if (!email)
+        throw new AppError('Email not found', 404);
+
+    res.send({ 
+        status: email.status, 
+        lastUpdateTime: email.timestamp ? new Date(email.timestamp * 1000).toISOString() : new Date().toISOString(), 
+        response: email.response || 'N.A.', 
+        reason: email.reason || 'N.A.', 
+        bounceCategory: email.bounceCategory || 'N.A.',
+    });
 });
 
 router.post('/webhooks', async (req: Request, res: Response) => {

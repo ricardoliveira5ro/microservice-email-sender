@@ -34,6 +34,7 @@ app.get('/api/health', (req: Request, res: Response) => {
     }
 });
 
+// Fallback invalid API routes
 app.all(/^\/api\/.*/, (req: Request, res: Response) => {
   res.status(404).json({ message: 'API route not found' });
 });

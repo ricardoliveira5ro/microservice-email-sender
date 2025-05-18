@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
+import { DateTime } from 'luxon';
 
 import { emailSendingValidator } from '../validators/emailValidators';
 import { jobQueue } from '../queue/connection';
@@ -13,12 +14,23 @@ const router = Router();
 router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
     emailSendingValidator.parse(req.body);
 
-    const { recipients, subject, text, category } = req.body as { recipients: [], subject: string, text: string, category: string };
+    const { recipients, subject, text, category, scheduledAt } = req.body as { recipients: [], subject: string, text: string, category: string, scheduledAt: string };
 
     const email = new Email({ recipients, subject, text, category });
     await email.save();
 
+    let delay = 0;
+
+    if (scheduledAt) {
+        const scheduledDate = DateTime.fromISO(scheduledAt);
+        if (!scheduledDate.isValid)
+            throw new AppError('Invalid date', 400);
+
+        delay = scheduledDate.toUTC().toMillis() - DateTime.utc().toMillis();
+    }
+
     const jobOptions = {
+        delay: delay > 0 ? delay : 0,
         attempts: 3,
         backoff: {
             type: 'exponential',

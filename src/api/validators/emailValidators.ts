@@ -7,4 +7,5 @@ export const emailSendingValidator = z.object({
     subject: z.string().max(60),
     text: z.string(),
     category: z.string().max(60),
+    scheduledAt: z.string().optional(),
 });

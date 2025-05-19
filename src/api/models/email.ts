@@ -1,6 +1,7 @@
-import { Document, Schema, model } from "mongoose";
+import { Document, Schema, Types, model } from "mongoose";
 
 export interface IEmail {
+    sender: Types.ObjectId;
     recipients: { email: string }[];
     subject: string;
     text: string;
@@ -17,6 +18,7 @@ export interface IEmail {
 };
 
 const emailSchema = new Schema<IEmail>({
+    sender: { type: Schema.Types.ObjectId, ref: 'User' },
     recipients: [{
         email: { type: String, required: true },
     }],

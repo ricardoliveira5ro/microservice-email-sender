@@ -54,13 +54,7 @@ router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, re
     if (!email)
         throw new AppError('Email not found', 404);
 
-    res.send({ 
-        status: email.status, 
-        lastUpdateTime: email.timestamp ? new Date(email.timestamp * 1000).toISOString() : new Date().toISOString(), 
-        response: email.response || 'N.A.', 
-        reason: email.reason || 'N.A.', 
-        bounceCategory: email.bounceCategory || 'N.A.',
-    });
+    res.send(email);
 });
 
 router.get('/all', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {

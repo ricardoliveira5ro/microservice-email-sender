@@ -38,9 +38,16 @@ const emailSchema = new Schema<IEmail>({
 });
 
 emailSchema.methods.toJSON = function (this: Document & IEmail): object {
-    const { _id, recipients, subject, text, category, status, messageId, eventId, timestamp, bounceCategory, response, reason, userAgent } = this.toObject() as Document & IEmail;
+    const { _id, status, timestamp, bounceCategory, response, reason } = this.toObject() as Document & IEmail;
 
-    return { _id, recipients, subject, text, category, status, messageId, eventId, timestamp, bounceCategory, response, reason, userAgent };
+    return {
+        _id,
+        status,
+        lastUpdateTime: timestamp ? new Date(timestamp * 1000).toISOString() : new Date().toISOString(),
+        bounceCategory: bounceCategory || 'N.A.',
+        response: response || 'N.A.',
+        reason: reason || 'N.A.',
+    };
 };
 
 const Email = model<IEmail>('Email', emailSchema);

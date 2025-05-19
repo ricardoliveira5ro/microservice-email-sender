@@ -2,11 +2,14 @@ import { Router, Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
 import { DateTime } from 'luxon';
 
-import { emailSendingValidator } from '../validators/emailValidators';
-import { jobQueue } from '../queue/connection';
-import { apiKeyAuthorizationMiddleware } from '../middlewares/apiKeyAuthorization';
 import config from '../config/config';
+import { jobQueue } from '../queue/connection';
+
+import { IUser } from '../models/user';
 import Email from '../models/email';
+
+import { apiKeyAuthorizationMiddleware } from '../middlewares/apiKeyAuthorization';
+import { emailSendingValidator } from '../validators/emailValidators';
 import AppError from '../utils/errors/AppError';
 
 const router = Router();
@@ -58,6 +61,13 @@ router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, re
         reason: email.reason || 'N.A.', 
         bounceCategory: email.bounceCategory || 'N.A.',
     });
+});
+
+router.get('/all', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
+    const { user } = req as Request & { user: IUser };
+    
+    const emails = await Email.find({ sender: user });
+    res.send({ emails });
 });
 
 router.post('/webhooks', async (req: Request, res: Response) => {

@@ -59,14 +59,23 @@ router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, re
 
 router.get('/all', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
     const { user } = req as Request & { user: IUser };
+    const { status, subject, page = 1, limit = 10 } = req.query;
+    const query: Record<string, unknown> = {};
 
-    const { page = 1, limit = 10 } = req.query;
+    query.sender = user;
+
+    if (status)
+        query.status = status;
+
+    if (subject)
+        query.subject = subject;
+
     const options = {
         skip: (parseInt(page as string, 10) - 1) * parseInt(limit as string, 10),
         limit: parseInt(limit as string, 10),
     };
 
-    const emails = await Email.find({ sender: user }, null, options);
+    const emails = await Email.find(query, null, options);
 
     res.send({ emails });
 });

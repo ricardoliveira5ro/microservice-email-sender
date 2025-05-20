@@ -1,15 +1,16 @@
 import { Router, Request, Response } from 'express';
 import { ObjectId } from 'mongodb';
+import { FilterQuery } from 'mongoose';
 import { DateTime } from 'luxon';
 
 import config from '../config/config';
 import { jobQueue } from '../queue/connection';
 
 import { IUser } from '../models/user';
-import Email from '../models/email';
+import Email, { IEmail } from '../models/email';
 
 import { apiKeyAuthorizationMiddleware } from '../middlewares/apiKeyAuthorization';
-import { emailSendingValidator } from '../validators/emailValidators';
+import { emailQueryValidator, emailSendingValidator } from '../validators/emailValidators';
 import AppError from '../utils/errors/AppError';
 
 const router = Router();
@@ -59,16 +60,21 @@ router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, re
 
 router.get('/all', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
     const { user } = req as Request & { user: IUser };
-    const { status, subject, page = 1, limit = 10 } = req.query;
-    const query: Record<string, unknown> = {};
+    const { status, subject, recipient, page = 1, limit = 10 } = req.query;
+    const query: FilterQuery<IEmail> = {};
 
-    query.sender = user;
+    emailQueryValidator.parse({ status, subject, recipient });
 
     if (status)
         query.status = status;
 
     if (subject)
         query.subject = subject;
+
+    if (recipient)
+        query.recipients = { $elemMatch: { email: recipient } };
+
+    query.sender = user;
 
     const options = {
         skip: (parseInt(page as string, 10) - 1) * parseInt(limit as string, 10),

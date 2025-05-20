@@ -9,3 +9,9 @@ export const emailSendingValidator = z.object({
     category: z.string().max(60),
     scheduledAt: z.string().optional(),
 });
+
+export const emailQueryValidator = z.object({
+    status: z.enum(['delivery', 'bounce', 'suspension', 'unsubscribe', 'open', 'spam', 'click', 'reject']).optional(),
+    subject: z.string().optional(),
+    recipient: z.string().optional(),
+});

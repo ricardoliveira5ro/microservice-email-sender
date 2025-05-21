@@ -3,7 +3,7 @@ import "./auth.css";
 
 export default function Auth() {
   return (
-    <div className="flex justify-center">
+    <div className="flex justify-center items-center h-screen">
       <div className="grid grid-cols-2 border rounded-md w-fit bg-white">
           <div className="relative w-full h-full min-h-[600px]">
             <Image src="/sending.png" className="rounded-l-md" fill alt="Google authentication" priority/>

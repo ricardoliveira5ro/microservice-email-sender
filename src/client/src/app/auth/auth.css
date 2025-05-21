@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+h1 {
+    font-family: "Raleway", sans-serif;
+}
+
+p, span, input, button, a {
+    font-family: "Montserrat", sans-serif;
+}
+
+*:focus {
+    outline: none;
+}
+
+.auth-form input,
+.auth-form p,
+.auth-form a {
+    color: black;
+}
+
+.auth-form input {
+    border-bottom: 1px solid var(--gray);
+}
+
+.auth-form input::placeholder {
+    color: #afafaf;
+}
+
+.auth-form input::-ms-input-placeholder {
+    color: #afafaf;
+}

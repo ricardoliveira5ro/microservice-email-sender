@@ -1,7 +1,13 @@
+'use client'
+
+import { useState } from "react";
 import Image from "next/image";
 import "./auth.css";
 
 export default function Auth() {
+
+  const [isLogin, setIsLogin] = useState(true);
+
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="grid grid-cols-2 border rounded-md w-fit bg-white">
@@ -15,23 +21,26 @@ export default function Auth() {
             </div>
 
             <div className="flex w-full gap-x-3">
-              <button className="w-20 h-1.5 bg-[var(--gray)] rounded-xs"></button>
-              <button className="w-20 h-1.5 bg-[var(--orange)] rounded-xs"></button>
+              <button onClick={() => setIsLogin(true)} className={`w-20 h-1.5 rounded-xs ${isLogin ? 'bg-[var(--orange)]' : 'bg-[var(--gray)]'}`}></button>
+              <button onClick={() => setIsLogin(false)} className={`w-20 h-1.5 rounded-xs ${!isLogin ? 'bg-[var(--orange)]' : 'bg-[var(--gray)]'}`}></button>
             </div>
 
             <form className="flex flex-col w-full gap-y-8 auth-form">
               <div className="flex flex-col w-full gap-y-8">
                 <input type="text" placeholder="Email" />
-                <input type="text" placeholder="Username" />
+                {!isLogin && <input type="text" placeholder="Username" />}
                 <input type="text" placeholder="Password" />
               </div>
               <div className="flex justify-between">
                 <p>Captcha</p>
-                <a className="underline" href="#">Forgot Password?</a>
+                <a className="cursor-pointer underline" href="#">Forgot Password?</a>
               </div>
-              <div className="flex items-center justify-between">
-                <button className="bg-[var(--orange)] rounded-sm w-fit px-14 py-2">Login</button>
-                <button className="p-1.5 rounded-full bg-[var(--orange)]"><Image src="/google-plus.png" width={24} height={24} alt="Google authentication"/></button>
+              <div className="flex flex-col gap-y-4">
+                <div className="flex items-center justify-between">
+                  <button className="bg-[var(--orange)] rounded-sm w-fit px-14 py-2">{isLogin ? "Login" : "Register"}</button>
+                  <button className="p-1.5 rounded-full bg-[var(--orange)]"><Image src="/google-plus.png" width={24} height={24} alt="Google authentication"/></button>
+                </div>
+                <a className="cursor-pointer underline" onClick={() => setIsLogin(!isLogin)}>{!isLogin ? "Login?" : "Register?"}</a>
               </div>
             </form>
           </div>

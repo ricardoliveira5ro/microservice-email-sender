@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import ReCAPTCHA from 'react-google-recaptcha'
 import "./auth.css";
 
 export default function Auth() {
@@ -31,8 +32,8 @@ export default function Auth() {
                 {!isLogin && <input type="text" placeholder="Username" />}
                 <input type="text" placeholder="Password" />
               </div>
-              <div className="flex justify-between">
-                <p>Captcha</p>
+              <div className="flex justify-between gap-x-10">
+                <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_SITE_KEY || ''} />
                 <a className="cursor-pointer underline" href="#">Forgot Password?</a>
               </div>
               <div className="flex flex-col gap-y-4">

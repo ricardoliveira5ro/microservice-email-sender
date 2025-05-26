@@ -29,3 +29,7 @@ p, span, input, button, a {
 .auth-form input::-ms-input-placeholder {
     color: #afafaf;
 }
+
+button {
+    cursor: pointer !important;
+}

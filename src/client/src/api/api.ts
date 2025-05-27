@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { VerifyRecaptcha } from './interfaces';
+import { Login, Signup, VerifyRecaptcha } from './interfaces';
 
 export const api = axios.create({
     baseURL: '/api',
@@ -16,5 +16,7 @@ const requests = {
 };
 
 export const UsersAPI = {
-    verifyRecaptcha: (formData: VerifyRecaptcha): Promise<VerifyRecaptcha> => requests.post('/users/verify-recaptcha', formData),
+	signup: (formData: Signup) => requests.post('/users/signup', formData),
+	login: (formData: Login) => requests.post('/users/login', formData),
+    verifyRecaptcha: (formData: VerifyRecaptcha) => requests.post('/users/verify-recaptcha', formData),
 };

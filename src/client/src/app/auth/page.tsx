@@ -11,19 +11,32 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const recaptcha = useRef<ReCAPTCHA>(null)
 
+  const [email, setEmail] = useState("");
+  const [username, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [isInvalidForm, setIsInvalidForm] = useState(false);
+
   async function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    
-    const captchaValue = recaptcha.current?.getValue()
 
-    if (captchaValue) {
-      UsersAPI.verifyRecaptcha({ captchaValue })
-        .then((data) => {
-          console.log(data);
+    if (isLogin) {
+      const captchaValue = recaptcha.current?.getValue()
+
+      if (captchaValue) {
+        UsersAPI.login({ email, password })
+          .then(() => {})
+          .catch(() => {
+            setIsInvalidForm(true)
+          })
+      }
+
+    } else {
+      UsersAPI.signup({ email, username, password })
+        .then(() => {})
+        .catch(() => {
+          setIsInvalidForm(true)
         })
-        .catch((err) => {
-          console.log(err);
-        });
     }
   }
 
@@ -45,15 +58,23 @@ export default function Auth() {
             </div>
 
             <form onSubmit={(e) => submitForm(e)} className="flex flex-col w-full gap-y-8 auth-form">
-              <div className="flex flex-col w-full gap-y-8">
-                <input type="text" placeholder="Email" />
-                {!isLogin && <input type="text" placeholder="Username" />}
-                <input type="text" placeholder="Password" />
+              <div className="flex flex-col w-full gap-y-3">
+                <input type="text" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} className={`py-2 ${isInvalidForm ? 'invalid-input' : ''}`} />
+                {!isLogin && <input type="text" placeholder="Username" value={username} onChange={(e) => setUserName(e.target.value)} className={`py-2 ${isInvalidForm ? 'invalid-input' : ''}`} />}
+                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={`py-2 ${isInvalidForm ? 'invalid-input' : ''}`} />
               </div>
-              <div className="flex justify-between gap-x-10">
-                <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_SITE_KEY || ''} ref={recaptcha} />
-                <a className="cursor-pointer underline" href="#">Forgot Password?</a>
-              </div>
+              {isInvalidForm &&
+                <div className="flex gap-x-2">
+                  <Image src="/warning.png" width={24} height={24} alt="Warning sign" priority/>
+                  <p>Unable to authenticate</p>
+                </div> 
+              }
+              {isLogin &&
+                <div className="flex justify-between gap-x-10">
+                  <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_SITE_KEY || ''} ref={recaptcha} />
+                  <a className="cursor-pointer underline" href="#">Forgot Password?</a>
+                </div>
+              }
               <div className="flex flex-col gap-y-4">
                 <div className="flex items-center justify-between">
                   <button className="bg-[var(--orange)] rounded-sm w-fit px-14 py-2">{isLogin ? "Login" : "Register"}</button>

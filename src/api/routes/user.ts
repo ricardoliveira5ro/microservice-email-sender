@@ -1,14 +1,11 @@
 import { Router, Request, Response } from 'express';
-import axios from 'axios';
 import crypto from 'crypto';
 import { ObjectId } from 'mongodb';
-
-import config from '../config/config';
 
 import User from '../models/user';
 import ApiKey from '../models/apiKey';
 
-import AppError from '../utils/errors/AppError';
+import { reCaptchaMiddleware } from '../middlewares/reCAPTCHA';
 import { userInvalidateKeyValidator, userLoginValidator, userSignUpValidator } from '../validators/userValidators';
 
 const router = Router();
@@ -22,7 +19,7 @@ router.post('/signup', async (req: Request, res: Response) => {
     res.send({ user });
 });
 
-router.post('/login', async (req: Request, res: Response) => {
+router.post('/login', reCaptchaMiddleware, async (req: Request, res: Response) => {
     userLoginValidator.parse(req.body);
 
     const { email, password } = req.body as { email: string; password: string };
@@ -54,16 +51,6 @@ router.post('/invalidateApiKey', async (req: Request, res: Response) => {
     await ApiKey.findByIdAndUpdate(new ObjectId(id), { $set: { isActive: false } });
     
     res.send({ user });
-});
-
-router.post('/verify-recaptcha', async (req: Request, res: Response) => {
-    const { captchaValue } = req.body as { captchaValue: string; };
-    const { data } = await axios.post<{ success: boolean }>(`https://www.google.com/recaptcha/api/siteverify?secret=${config.recaptchaSiteSecret}&response=${captchaValue}`);
-    
-    if (!data.success)
-        throw new AppError("Invalid reCAPTCHA", 401);
-
-    res.send({ success: data.success });
 });
 
 export default router;

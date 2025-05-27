@@ -27,7 +27,7 @@ export default function Auth() {
       const captchaValue = recaptcha.current?.getValue();
 
       if (captchaValue) {
-        UsersAPI.login({ email, password })
+        UsersAPI.login({ email, password, captchaValue })
           .then(() => {
             setIsInvalidForm(false);
 
@@ -39,6 +39,7 @@ export default function Auth() {
           })
           .catch(() => {
             setIsInvalidForm(true);
+            recaptcha.current?.reset();
           })
       }
 

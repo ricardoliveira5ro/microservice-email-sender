@@ -8,8 +8,8 @@ export interface IUser {
     username: string;
     email: string;
     password: string;
-    passwordResetToken: string;
-    passwordResetExpiration: Date;
+    passwordResetToken?: string;
+    passwordResetExpiration?: Date;
 };
 
 interface IUserModel extends Model<IUser> {

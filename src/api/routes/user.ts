@@ -1,14 +1,16 @@
 import { Router, Request, Response } from 'express';
 import crypto, { randomUUID } from 'crypto';
 import { ObjectId } from 'mongodb';
+import { HydratedDocument } from 'mongoose';
 
-import User from '../models/user';
+import User, { IUser } from '../models/user';
 import ApiKey from '../models/apiKey';
 
 import sendEmail from '../services/email';
 import { reCaptchaMiddleware } from '../middlewares/reCAPTCHA';
+import { resetMiddleware } from '../middlewares/resetMiddleware';
 
-import { userInvalidateKeyValidator, userLoginValidator, userRecoveryPasswordValidator, userSignUpValidator } from '../validators/userValidators';
+import { userInvalidateKeyValidator, userLoginValidator, userRecoveryPasswordValidator, userResetPasswordValidator, userSignUpValidator } from '../validators/userValidators';
 import AppError from '../utils/errors/AppError';
 import recoveryTemplate from '../utils/emails/recoveryTemplate';
 
@@ -80,6 +82,21 @@ router.post('/recovery', async (req: Request, res: Response) => {
     await sendEmail([{ email }], "Password Recovery", html, "Password Recovery");
 
     res.send({ message: "Recovery email sent" });
+});
+
+router.post('/reset', resetMiddleware, async (req: Request, res: Response) => {
+    userResetPasswordValidator.parse(req.body);
+
+    const { user } = req as Request & { user: HydratedDocument<IUser> };
+    const { password } = req.body as { password: string };
+
+    user.password = password;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpiration = undefined;
+
+    await user.save();
+
+    res.send({ message: "Reset successful" });
 });
 
 export default router;

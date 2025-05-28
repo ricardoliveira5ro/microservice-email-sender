@@ -1,12 +1,16 @@
 import { Router, Request, Response } from 'express';
-import crypto from 'crypto';
+import crypto, { randomUUID } from 'crypto';
 import { ObjectId } from 'mongodb';
 
 import User from '../models/user';
 import ApiKey from '../models/apiKey';
 
+import sendEmail from '../services/email';
 import { reCaptchaMiddleware } from '../middlewares/reCAPTCHA';
-import { userInvalidateKeyValidator, userLoginValidator, userSignUpValidator } from '../validators/userValidators';
+
+import { userInvalidateKeyValidator, userLoginValidator, userRecoveryPasswordValidator, userSignUpValidator } from '../validators/userValidators';
+import AppError from '../utils/errors/AppError';
+import recoveryTemplate from '../utils/emails/recoveryTemplate';
 
 const router = Router();
 
@@ -51,6 +55,31 @@ router.post('/invalidateApiKey', async (req: Request, res: Response) => {
     await ApiKey.findByIdAndUpdate(new ObjectId(id), { $set: { isActive: false } });
     
     res.send({ user });
+});
+
+router.post('/recovery', async (req: Request, res: Response) => {
+    userRecoveryPasswordValidator.parse(req.body);
+
+    const { email } = req.body as { email: string; };
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    const uuid = randomUUID();
+    user.passwordResetToken = uuid;
+    user.passwordResetExpiration = new Date(Date.now() + 1 * 60 * 60 * 1000); // 1 hour
+
+    await user.save();
+
+    const domain = `${req.protocol}://${req.get('host') ?? 'localhost:3000'}`;
+    const link = `${domain}/reset-password?user=${user.username}&reset_token=${uuid}`;
+    const html = recoveryTemplate(user, link);
+
+    await sendEmail([{ email }], "Password Recovery", html, "Password Recovery");
+
+    res.send({ message: "Recovery email sent" });
 });
 
 export default router;

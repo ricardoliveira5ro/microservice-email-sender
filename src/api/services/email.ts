@@ -2,7 +2,7 @@ import { MailtrapClient, SendResponse } from "mailtrap";
 
 import config from "../config/config";
 
-export default function sendEmail(recipients: [], subject: string, text: string, category: string): Promise<SendResponse> {
+export default function sendEmail(recipients: { email: string }[], subject: string, text: string, category: string): Promise<SendResponse> {
     const client = new MailtrapClient({ token: config.mailtrapToken });
 
     const sender = {
@@ -14,7 +14,7 @@ export default function sendEmail(recipients: [], subject: string, text: string,
         from: sender,
         to: recipients,
         subject: subject,
-        text: text,
+        html: text,
         category: category,
     });
 };

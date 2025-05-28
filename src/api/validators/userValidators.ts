@@ -16,3 +16,7 @@ export const userInvalidateKeyValidator = z.object({
     password: z.string(),
     id: z.string(),
 });
+
+export const userRecoveryPasswordValidator = z.object({
+    email: z.string().email(),
+});

@@ -8,6 +8,8 @@ export interface IUser {
     username: string;
     email: string;
     password: string;
+    passwordResetToken: string;
+    passwordResetExpiration: Date;
 };
 
 interface IUserModel extends Model<IUser> {
@@ -40,6 +42,14 @@ const userSchema = new Schema<IUser, IUserModel>({
             message: 'Password is invalid',
         },
     },
+    passwordResetToken: {
+        type: String,
+        required: false,
+    },
+    passwordResetExpiration: {
+        type: Date,
+        required: false,
+    },
 }, {
     timestamps: true,
 });
@@ -54,6 +64,10 @@ userSchema.virtual('apiKeys', {
 userSchema.pre('save', async function (): Promise<void> {
     if (this.password && this.isModified('password')) {
         this.password = await bcrypt.hash(this.password, 8);
+    }
+
+    if (this.passwordResetToken && this.isModified('passwordResetToken')) {
+        this.passwordResetToken = await bcrypt.hash(this.passwordResetToken, 8);
     }
 });
 

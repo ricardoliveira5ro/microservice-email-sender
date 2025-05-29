@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Login, Signup } from './interfaces';
+import { Login, Recovery, Reset, Signup } from './interfaces';
 
 export const api = axios.create({
     baseURL: '/api',
@@ -18,4 +18,6 @@ const requests = {
 export const UsersAPI = {
 	signup: (formData: Signup) => requests.post('/users/signup', formData),
 	login: (formData: Login) => requests.post('/users/login', formData),
+	recovery: (formData: Recovery) => requests.post('/users/recovery', formData),
+	reset: (formData: Reset, user: string, resetToken: string) => requests.post(`/users/recovery?user=${encodeURIComponent(user)}&resetToken=${encodeURIComponent(resetToken)}`, formData),
 };

@@ -9,3 +9,11 @@ export interface Login {
     password: string;
     captchaValue: string;
 }
+
+export interface Recovery {
+    email: string;
+}
+
+export interface Reset {
+    password: string;
+}

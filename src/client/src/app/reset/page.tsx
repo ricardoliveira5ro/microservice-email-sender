@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { UsersAPI } from "@/api/api";
@@ -8,8 +8,7 @@ import { CircleAlert } from "lucide-react";
 
 import './reset.css'
 
-export default function ResetPassword() {
-
+function ResetPassword() {
     const searchParams = useSearchParams();
     const router = useRouter();
 
@@ -60,4 +59,12 @@ export default function ResetPassword() {
             }
         </div>
     ); 
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ResetPassword />
+        </Suspense>
+    );
 }

@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+.reset-form input {
+    @apply rounded-md text-black border border-black px-3 py-1
+}
+
+.reset-form input::placeholder {
+    color: black;
+}
+
+.reset-form input::-ms-input-placeholder {
+    color: black;
+}

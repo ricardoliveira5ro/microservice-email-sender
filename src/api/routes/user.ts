@@ -75,8 +75,7 @@ router.post('/recovery', async (req: Request, res: Response) => {
 
     await user.save();
 
-    const domain = `${req.protocol}://${req.get('host') ?? 'localhost:3000'}`;
-    const link = `${domain}/reset-password?user=${user.username}&reset_token=${uuid}`;
+    const link = `${req.headers.origin ?? 'http://localhost:3000'}/reset?user=${user.username}&resetToken=${uuid}`;
     const html = recoveryTemplate(user, link);
 
     await sendEmail([{ email }], "Password Recovery", html, "Password Recovery");
@@ -97,6 +96,10 @@ router.post('/reset', resetMiddleware, async (req: Request, res: Response) => {
     await user.save();
 
     res.send({ message: "Reset successful" });
+});
+
+router.get('/reset-token', resetMiddleware, (req: Request, res: Response) => {
+    res.send({ message: "Verified with success" });
 });
 
 export default router;

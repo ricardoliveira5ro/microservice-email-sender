@@ -59,6 +59,13 @@ export default function Auth() {
     }
   }
 
+  async function passwordRecovery() {
+    UsersAPI.recovery({ email })
+      .then(() => {
+        // Successful alert
+      });
+  }
+
   return (
     <div className="flex justify-center items-center h-screen">
       <div className="grid grid-cols-2 border rounded-md w-fit bg-white">
@@ -91,7 +98,7 @@ export default function Auth() {
               {isLogin &&
                 <div className="flex justify-between gap-x-10">
                   <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_SITE_KEY || ''} ref={recaptcha} />
-                  <a className="cursor-pointer underline" href="#">Forgot Password?</a>
+                  <button className="cursor-pointer underline text-black" onClick={passwordRecovery}>Forgot Password?</button>
                 </div>
               }
               <div className="flex items-center justify-between">

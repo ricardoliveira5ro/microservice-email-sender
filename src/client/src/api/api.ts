@@ -18,6 +18,7 @@ const requests = {
 export const UsersAPI = {
 	signup: (formData: Signup) => requests.post('/users/signup', formData),
 	login: (formData: Login) => requests.post('/users/login', formData),
+	verifyToken: () => requests.get('/users/token'),
 	recovery: (formData: Recovery) => requests.post('/users/recovery', formData),
 	reset: (formData: Reset, user: string, resetToken: string) => requests.post(`/users/reset?user=${encodeURIComponent(user)}&resetToken=${encodeURIComponent(resetToken)}`, formData),
 	verifyResetToken: (user: string, resetToken: string) => requests.get(`/users/reset-token?user=${encodeURIComponent(user)}&resetToken=${encodeURIComponent(resetToken)}`),

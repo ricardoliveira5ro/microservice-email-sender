@@ -35,7 +35,7 @@ export default function Auth() {
             setUsername("");
             setPassword("");
 
-            router.push('/');
+            router.push('/profile');
           })
           .catch(() => {
             setIsInvalidForm(true);

@@ -9,6 +9,8 @@ import ApiKey from '../models/apiKey';
 import sendEmail from '../services/email';
 import { reCaptchaMiddleware } from '../middlewares/reCAPTCHA';
 import { resetMiddleware } from '../middlewares/resetMiddleware';
+import { jwtMiddleware } from '../middlewares/jwt';
+import { authMiddleware } from '../middlewares/auth';
 
 import { userInvalidateKeyValidator, userLoginValidator, userRecoveryPasswordValidator, userResetPasswordValidator, userSignUpValidator } from '../validators/userValidators';
 import AppError from '../utils/errors/AppError';
@@ -46,6 +48,11 @@ router.post('/login', reCaptchaMiddleware, async (req: Request, res: Response) =
         sameSite: isProduction ? 'strict' : 'lax',
     });
     
+    res.send({ user });
+});
+
+router.get('/token', [jwtMiddleware, authMiddleware], (req: Request, res: Response) => {
+    const { user } = req as Request & { user: IUser };
     res.send({ user });
 });
 

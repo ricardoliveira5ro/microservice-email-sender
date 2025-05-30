@@ -1,22 +1,29 @@
-import { Document, Schema, Model, model } from "mongoose";
+import { Document, Schema, Model, model, HydratedDocument } from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { isEmail, isStrongPassword } from "validator";
 
+import config from "../config/config";
 import AppError from "../utils/errors/AppError";
 
 export interface IUser {
     username: string;
     email: string;
     password: string;
+    tokens: { token: string }[];
     passwordResetToken?: string;
     passwordResetExpiration?: Date;
 };
 
 interface IUserModel extends Model<IUser> {
-    authenticate(email: string, password: string): Promise<Document & IUser>;
+    authenticate(email: string, password: string): Promise<HydratedDocument<IUser, UserMethods>>;
 };
 
-const userSchema = new Schema<IUser, IUserModel>({
+interface UserMethods {
+    generateAuthToken(): Promise<string>;
+}
+
+const userSchema = new Schema<IUser, IUserModel, UserMethods>({
     username: { 
         type: String, 
         unique: true, 
@@ -42,6 +49,9 @@ const userSchema = new Schema<IUser, IUserModel>({
             message: 'Password is invalid',
         },
     },
+    tokens: [{
+        token: { type: String, required: true },
+    }],
     passwordResetToken: {
         type: String,
         required: false,
@@ -71,7 +81,7 @@ userSchema.pre('save', async function (): Promise<void> {
     }
 });
 
-userSchema.static('authenticate', async function authenticate (email: string, password: string): Promise<Document & IUser> {
+userSchema.static('authenticate', async function authenticate (email: string, password: string): Promise<HydratedDocument<IUser>> {
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -86,6 +96,16 @@ userSchema.static('authenticate', async function authenticate (email: string, pa
 
     return user;
 });
+
+userSchema.method('generateAuthToken', async function generateAuthToken() {
+    const user = this as HydratedDocument<IUser>;
+    const token = jwt.sign({ _id: user._id.toString() }, config.jwtSecret);
+
+    user.tokens = user.tokens.concat({ token });
+    await user.save();
+
+    return token;
+});;
 
 userSchema.methods.toJSON = function (this: Document & IUser): object {
     const { _id, username, email } = this.toObject() as Document & IUser;

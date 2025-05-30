@@ -9,6 +9,7 @@ interface Config {
     mailtrapToken: string;
     redisURL: string;
     recaptchaSiteSecret: string;
+    jwtSecret: string;
 };
 
 const config: Config = {
@@ -18,6 +19,7 @@ const config: Config = {
     mailtrapToken: process.env.MAILTRAP_TOKEN ?? '',
     redisURL: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
     recaptchaSiteSecret: process.env.RECAPTCHA_SITE_SECRET ?? '',
+    jwtSecret: process.env.JWT_SECRET ?? '',
 };
 
 export default config;

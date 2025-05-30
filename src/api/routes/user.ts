@@ -30,6 +30,21 @@ router.post('/login', reCaptchaMiddleware, async (req: Request, res: Response) =
 
     const { email, password } = req.body as { email: string; password: string };
     const user = await User.authenticate(email, password);
+    const token = await user.generateAuthToken();
+
+    const [header, payload, signature] = token.split('.');
+
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie('email-sender-header-payload', `${header}.${payload}`, {
+        httpOnly: false,
+        secure: isProduction ? true : false,
+        sameSite: isProduction ? 'strict' : 'lax',
+    });
+    res.cookie('email-sender-signature', signature, {
+        httpOnly: true,
+        secure: isProduction ? true : false,
+        sameSite: isProduction ? 'strict' : 'lax',
+    });
     
     res.send({ user });
 });

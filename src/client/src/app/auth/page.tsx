@@ -3,8 +3,10 @@
 import { FormEvent, useRef, useState } from "react";
 import { UsersAPI } from "@/api/api";
 import { useRouter } from "next/navigation";
+import { AxiosError } from "axios";
 import Image from "next/image";
-import ReCAPTCHA from 'react-google-recaptcha'
+import ReCAPTCHA from 'react-google-recaptcha';
+import toast, { Toaster } from 'react-hot-toast';
 import "./auth.css";
 
 export default function Auth() {
@@ -39,6 +41,7 @@ export default function Auth() {
           })
           .catch(() => {
             setIsInvalidForm(true);
+            toast.error('Unable to login');
             recaptcha.current?.reset();
           })
       }
@@ -52,8 +55,12 @@ export default function Auth() {
           setEmail("");
           setUsername("");
           setPassword("");
+
+          toast.success('Signup successfully');
+          setIsInvalidForm(false);
         })
-        .catch(() => {
+        .catch((e: AxiosError<{ message: string }>) => {
+          toast.error(e.response?.data.message || "Something went wrong");
           setIsInvalidForm(true);
         })
     }
@@ -62,12 +69,16 @@ export default function Auth() {
   async function passwordRecovery() {
     UsersAPI.recovery({ email })
       .then(() => {
-        // Successful alert
+        toast.success('Password reset link sent to your email');
+      })
+      .catch(() => {
+        toast.error('Something went wrong');
       });
   }
 
   return (
     <div className="flex justify-center items-center h-screen">
+      <Toaster />
       <div className="grid grid-cols-2 border rounded-md w-fit bg-white">
           <div className="relative w-full h-full min-h-[600px]">
             <Image src="/sending.png" className="rounded-l-md" fill alt="Google authentication" priority/>
@@ -89,12 +100,6 @@ export default function Auth() {
                 {!isLogin && <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} className={`py-2 ${isInvalidForm ? 'invalid-input' : ''}`} />}
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={`py-2 ${isInvalidForm ? 'invalid-input' : ''}`} />
               </div>
-              {isInvalidForm &&
-                <div className="flex gap-x-2">
-                  <Image src="/warning.png" width={24} height={24} alt="Warning sign" priority/>
-                  <p>Unable to authenticate</p>
-                </div> 
-              }
               {isLogin &&
                 <div className="flex justify-between gap-x-10">
                   <ReCAPTCHA sitekey={process.env.NEXT_PUBLIC_SITE_KEY || ''} ref={recaptcha} />

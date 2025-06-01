@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 
 import userRoutes from './routes/user';
 import emailRoutes from './routes/email';
+import apiKeysRoutes from './routes/apiKey';
 
 import { errorHandler } from './middlewares/errorHandler';
 import { startEmailWorker } from './workers/email';
@@ -18,6 +19,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/emails', emailRoutes);
+app.use('/api/apiKeys', apiKeysRoutes);
 
 // Health Check
 app.get('/api/health', (req: Request, res: Response) => {

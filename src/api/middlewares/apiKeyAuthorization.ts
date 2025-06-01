@@ -26,6 +26,9 @@ export const apiKeyAuthorizationMiddleware = async (req: Request, res: Response,
         next(new AppError("Invalid API Key", 401));
         return;
     }
+
+    apiKey.lastUsage = new Date();
+    await apiKey.save();
     
     const user = apiKey.user as unknown as IUser;
     (req as Request & { user: IUser }).user = user;

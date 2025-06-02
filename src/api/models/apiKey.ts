@@ -1,12 +1,14 @@
 import { Document, Schema, Types, model } from "mongoose";
 import bcrypt from "bcrypt";
 
+import { lastUsageConverter } from "../utils/functions";
+
 interface IApiKey {
     name: string;
     key: string;
     permission: string;
     isActive: boolean;
-    lastUsage: Date;
+    lastUsage?: Date;
     user: Types.ObjectId;
 };
 
@@ -30,7 +32,14 @@ apiKeySchema.pre('save', async function(): Promise<void> {
 apiKeySchema.methods.toJSON = function (this: Document & IApiKey): object {
     const { _id, name, isActive, user, lastUsage, createdAt } = this.toObject() as Document & IApiKey & { createdAt: Date };
     
-    return { _id, name, isActive, user, lastUsage, createdAt };
+    return { 
+        _id,
+        name,
+        isActive, 
+        user,
+        lastUsage: lastUsageConverter(lastUsage),
+        createdAt: createdAt.toISOString().split('T')[0],
+    };
 };
 
 const ApiKey = model<IApiKey>('ApiKey', apiKeySchema);

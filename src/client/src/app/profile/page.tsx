@@ -4,7 +4,7 @@ import { UsersAPI } from "@/api/api";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ChartColumn, Inbox, KeyRound } from "lucide-react";
-import ApiKeys from "./apiKeys";
+import ApiKeys from "./apiKeys/apiKeys";
 
 export default function Profile() {
 

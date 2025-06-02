@@ -1,10 +1,8 @@
 import { Router, Request, Response } from 'express';
-import crypto, { randomUUID } from 'crypto';
-import { ObjectId } from 'mongodb';
+import { randomUUID } from 'crypto';
 import { HydratedDocument } from 'mongoose';
 
 import User, { IUser } from '../models/user';
-import ApiKey from '../models/apiKey';
 
 import sendEmail from '../services/email';
 import { reCaptchaMiddleware } from '../middlewares/reCAPTCHA';
@@ -12,7 +10,7 @@ import { resetMiddleware } from '../middlewares/resetMiddleware';
 import { jwtMiddleware } from '../middlewares/jwt';
 import { authMiddleware } from '../middlewares/auth';
 
-import { userInvalidateKeyValidator, userLoginValidator, userRecoveryPasswordValidator, userResetPasswordValidator, userSignUpValidator } from '../validators/userValidators';
+import { userLoginValidator, userRecoveryPasswordValidator, userResetPasswordValidator, userSignUpValidator } from '../validators/userValidators';
 import AppError from '../utils/errors/AppError';
 import recoveryTemplate from '../utils/emails/recoveryTemplate';
 
@@ -53,31 +51,6 @@ router.post('/login', reCaptchaMiddleware, async (req: Request, res: Response) =
 
 router.get('/token', [jwtMiddleware, authMiddleware], (req: Request, res: Response) => {
     const { user } = req as Request & { user: IUser };
-    res.send({ user });
-});
-
-router.get('/generateApiKey', async (req: Request, res: Response) => {
-    userLoginValidator.parse(req.body);
-    
-    const { email, password } = req.body as { email: string; password: string };
-    const user = await User.authenticate(email, password);
-
-    const tmpKey = crypto.randomBytes(32).toString("hex");
-    const apiKey = new ApiKey({ key: tmpKey, user: user });
-
-    await apiKey.save();
-    
-    res.send({ authId: apiKey._id, apiKey: tmpKey });
-});
-
-router.post('/invalidateApiKey', async (req: Request, res: Response) => {
-    userInvalidateKeyValidator.parse(req.body);
-
-    const { email, password, id } = req.body as { email: string; password: string, id: string };
-    const user = await User.authenticate(email, password);
-
-    await ApiKey.findByIdAndUpdate(new ObjectId(id), { $set: { isActive: false } });
-    
     res.send({ user });
 });
 

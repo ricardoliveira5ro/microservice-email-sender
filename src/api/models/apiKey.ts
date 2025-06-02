@@ -30,12 +30,13 @@ apiKeySchema.pre('save', async function(): Promise<void> {
 });
 
 apiKeySchema.methods.toJSON = function (this: Document & IApiKey): object {
-    const { _id, name, isActive, user, lastUsage, createdAt } = this.toObject() as Document & IApiKey & { createdAt: Date };
+    const { _id, name, isActive, permission, user, lastUsage, createdAt } = this.toObject() as Document & IApiKey & { createdAt: Date };
     
     return { 
         _id,
         name,
-        isActive, 
+        isActive,
+        permission,
         user,
         lastUsage: lastUsageConverter(lastUsage),
         createdAt: createdAt.toISOString().split('T')[0],

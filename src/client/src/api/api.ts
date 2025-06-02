@@ -23,3 +23,7 @@ export const UsersAPI = {
 	reset: (formData: Reset, user: string, resetToken: string) => requests.post(`/users/reset?user=${encodeURIComponent(user)}&resetToken=${encodeURIComponent(resetToken)}`, formData),
 	verifyResetToken: (user: string, resetToken: string) => requests.get(`/users/reset-token?user=${encodeURIComponent(user)}&resetToken=${encodeURIComponent(resetToken)}`),
 };
+
+export const KeysAPI = {
+	all: () => requests.get('/apiKeys/all'),
+};

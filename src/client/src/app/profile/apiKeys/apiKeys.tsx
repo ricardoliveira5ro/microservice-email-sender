@@ -104,7 +104,7 @@ export default function ApiKeysPage() {
                     </tr>
                 </thead>
                 {apiKeys ? (
-                    <ApiKeysList apiKeys={apiKeys} />
+                    <ApiKeysList apiKeys={apiKeys} fetchKeys={fetchApiKeys} />
                 ) : (
                     <ApiKeysLoading />
                 )}

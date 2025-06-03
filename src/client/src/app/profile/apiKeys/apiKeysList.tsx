@@ -1,9 +1,23 @@
 'use client';
 
-import { Trash2 } from "lucide-react";
+import { Ban, Trash2 } from "lucide-react";
 import { APIKey } from "@/models/apiKey";
+import { KeysAPI } from "@/api/api";
 
-export default function ApiKeysList({ apiKeys }: { apiKeys: APIKey[] }) {
+export default function ApiKeysList({ apiKeys, fetchKeys }: { 
+    apiKeys: APIKey[],
+    fetchKeys: () => void;
+}) {
+
+    async function handleInvalidateAPIKey (authId: string) {
+        KeysAPI.invalidateAPIKey({ authId })
+            .then(() => fetchKeys());
+    };
+
+    async function handleDeleteAPIKey (authId: string) {
+        KeysAPI.deleteAPIKey(authId)
+            .then(() => fetchKeys());
+    }
 
     return (
         <tbody>
@@ -19,7 +33,16 @@ export default function ApiKeysList({ apiKeys }: { apiKeys: APIKey[] }) {
                     <td className="px-5 py-3">{apiKey.lastUsage}</td>
                     <td className="px-5 py-3">{apiKey.createdAt}</td>
                     <td className="px-5 py-3">
-                        <Trash2 size={20} color="var(--orange)"/>
+                        <div className="flex gap-x-4 justify-end">
+                            {apiKey.isActive &&
+                                <button onClick={() => handleInvalidateAPIKey(apiKey.authId)}>
+                                    <Ban size={20} />
+                                </button>
+                            }
+                            <button onClick={() => handleDeleteAPIKey(apiKey.authId)}>
+                                <Trash2 size={20} color="var(--orange)"/>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             ))}

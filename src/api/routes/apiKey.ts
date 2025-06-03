@@ -42,4 +42,12 @@ router.post('/invalidateApiKey', [jwtMiddleware, authMiddleware], async (req: Re
     res.send({ apiKey });
 });
 
+router.delete('/:authId', [jwtMiddleware, authMiddleware], async (req: Request, res: Response) => {
+    const authId = req.params.authId;
+    
+    await ApiKey.findByIdAndDelete(new ObjectId(authId));
+    
+    res.send({ message: "Success" });
+});
+
 export default router;

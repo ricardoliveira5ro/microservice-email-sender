@@ -33,7 +33,7 @@ apiKeySchema.methods.toJSON = function (this: Document & IApiKey): object {
     const { _id, name, isActive, permission, user, lastUsage, createdAt } = this.toObject() as Document & IApiKey & { createdAt: Date };
     
     return { 
-        _id,
+        authId: _id,
         name,
         isActive,
         permission,

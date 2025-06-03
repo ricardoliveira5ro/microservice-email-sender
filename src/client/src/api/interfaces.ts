@@ -22,3 +22,7 @@ export interface GenerateAPIKey {
     name: string;
     permission: string;
 }
+
+export interface InvalidateAPIKey {
+    authId: string;
+}

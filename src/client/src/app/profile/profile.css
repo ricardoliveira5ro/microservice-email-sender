@@ -1,3 +1,11 @@
 .apiKey-table {
     font-family: var(--font-geist-sans);
 }
+
+.radio-button-permission label {
+    font-family: var(--font-geist-sans);
+}
+
+.radio-button-permission input {
+    font-family: var(--font-geist-sans);
+}

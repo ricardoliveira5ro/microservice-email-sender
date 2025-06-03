@@ -17,3 +17,8 @@ export interface Recovery {
 export interface Reset {
     password: string;
 }
+
+export interface GenerateAPIKey {
+    name: string;
+    permission: string;
+}

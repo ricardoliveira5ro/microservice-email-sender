@@ -1,20 +1,9 @@
 'use client';
 
 import { Trash2 } from "lucide-react";
-import { KeysAPI } from "@/api/api";
 import { APIKey } from "@/models/apiKey";
-import { useEffect, useState } from "react";
 
-export default function ApiKeysList() {
-    const [apiKeys, setApiKeys] = useState<APIKey[] | null>(null);
-
-    useEffect(() => {
-        KeysAPI.all().then((data) => setApiKeys(data.apiKeys));
-    }, []);
-
-    if (!apiKeys) {
-        return (null);
-    }
+export default function ApiKeysList({ apiKeys }: { apiKeys: APIKey[] }) {
 
     return (
         <tbody>

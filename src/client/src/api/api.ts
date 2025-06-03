@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Login, Recovery, Reset, Signup } from './interfaces';
+import { GenerateAPIKey, Login, Recovery, Reset, Signup } from './interfaces';
 
 export const api = axios.create({
     baseURL: '/api',
@@ -26,4 +26,5 @@ export const UsersAPI = {
 
 export const KeysAPI = {
 	all: () => requests.get('/apiKeys/all'),
+	generateAPIKey: (formData: GenerateAPIKey) => requests.post('/apiKeys/generateApiKey', formData),
 };

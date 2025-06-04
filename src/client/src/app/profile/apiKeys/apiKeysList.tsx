@@ -4,9 +4,10 @@ import { Ban, Clipboard, Trash2 } from "lucide-react";
 import { APIKey } from "@/models/apiKey";
 import { KeysAPI } from "@/api/api";
 
-export default function ApiKeysList({ apiKeys, fetchKeys }: { 
+export default function ApiKeysList({ apiKeys, fetchKeys, copyToClipboard }: { 
     apiKeys: APIKey[],
     fetchKeys: () => void;
+    copyToClipboard: (text: string) => void;
 }) {
 
     async function handleInvalidateAPIKey (authId: string) {
@@ -25,7 +26,7 @@ export default function ApiKeysList({ apiKeys, fetchKeys }: {
                 <tr key={index}>
                     <td className="px-5 py-3">{apiKey.name}</td>
                     <td className="px-5 py-3 flex items-center justify-center">
-                        <button onClick={() => navigator.clipboard.writeText(apiKey.authId)}>
+                        <button onClick={() => copyToClipboard(apiKey.authId)}>
                             <Clipboard size={22} />
                         </button>
                     </td>

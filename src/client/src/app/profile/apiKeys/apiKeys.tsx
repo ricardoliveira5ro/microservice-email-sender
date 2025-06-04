@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { Plus, CodeXml, Clipboard } from "lucide-react";
+import { Plus, CodeXml, Clipboard, RefreshCcw } from "lucide-react";
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import toast, { Toaster } from 'react-hot-toast';
 import { KeysAPI } from "@/api/api";
@@ -55,17 +55,32 @@ export default function ApiKeysPage() {
         setPermission("READ");
     }
 
+    async function refresh() {
+        await fetchApiKeys();
+        toast.success("Up to date");
+    }
+
+    const copyToClipboard = (text: string) => {
+        navigator.clipboard.writeText(text);
+        toast.success("Copied");
+    }
+
     return (
         <div className="flex flex-col w-fit gap-y-8">
             <Toaster />
-            <div className="flex gap-x-4">
-                <button onClick={() => setIsModalOpen(true)} className="flex gap-x-2 bg-[var(--orange)] py-2 px-4 rounded-lg">
-                    <Plus />
-                    <span>Create API Key</span>
-                </button>
-                <button className="flex gap-x-2 bg-[#34353b] py-2 px-4 rounded-lg">
-                    <CodeXml />
-                    <span>API</span>
+            <div className="flex justify-between items-center gap-x-4">
+                <div className="flex gap-x-4">
+                    <button onClick={() => setIsModalOpen(true)} className="flex gap-x-2 bg-[var(--orange)] py-2 px-4 rounded-lg">
+                        <Plus />
+                        <span>Create API Key</span>
+                    </button>
+                    <button className="flex gap-x-2 bg-[#34353b] py-2 px-4 rounded-lg">
+                        <CodeXml />
+                        <span>API</span>
+                    </button>
+                </div>
+                <button onClick={refresh}>
+                    <RefreshCcw />
                 </button>
             </div>
 
@@ -94,7 +109,7 @@ export default function ApiKeysPage() {
                                         <span className="text-sm">Auth Id</span>
                                         <div className="flex justify-between items-center border border-[#34353b] rounded-lg px-3 py-1">
                                             <span>{generatedKey.authId}</span>
-                                            <button onClick={() => navigator.clipboard.writeText(generatedKey.authId)}>
+                                            <button onClick={() => copyToClipboard(generatedKey.authId)}>
                                                 <Clipboard size={18} />
                                             </button>
                                         </div>
@@ -103,7 +118,7 @@ export default function ApiKeysPage() {
                                         <span className="text-sm text-[var(--orange)]">This key will only be shown once. Please make sure to copy it now.</span>
                                         <div className="flex justify-between items-center border border-[#34353b] rounded-lg px-3 py-1">
                                             <span>{generatedKey.apiKey}</span>
-                                            <button onClick={() => navigator.clipboard.writeText(generatedKey.apiKey)}>
+                                            <button onClick={() => copyToClipboard(generatedKey.apiKey)}>
                                                 <Clipboard size={18} />
                                             </button>
                                         </div>
@@ -134,7 +149,7 @@ export default function ApiKeysPage() {
                     </tr>
                 </thead>
                 {apiKeys ? (
-                    <ApiKeysList apiKeys={apiKeys} fetchKeys={fetchApiKeys} />
+                    <ApiKeysList apiKeys={apiKeys} fetchKeys={fetchApiKeys} copyToClipboard={copyToClipboard} />
                 ) : (
                     <ApiKeysLoading />
                 )}

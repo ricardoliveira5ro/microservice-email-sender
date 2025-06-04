@@ -15,7 +15,7 @@ import AppError from '../utils/errors/AppError';
 
 const router = Router();
 
-router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
+router.post('/send-email', apiKeyAuthorizationMiddleware(["WRITE"]), async (req: Request, res: Response) => {
     emailSendingValidator.parse(req.body);
 
     const { recipients, subject, text, category, scheduledAt } = req.body as { recipients: [], subject: string, text: string, category: string, scheduledAt: string };
@@ -48,7 +48,7 @@ router.post('/send-email', apiKeyAuthorizationMiddleware, async (req: Request, r
     res.send({ emailId: email._id, message: "Email queued for delivery" });
 });
 
-router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
+router.get('/status/:id', apiKeyAuthorizationMiddleware(["READ", "WRITE"]), async (req: Request, res: Response) => {
     const id = req.params.id;
     const email = await Email.findById(new ObjectId(id));
 
@@ -58,7 +58,7 @@ router.get('/status/:id', apiKeyAuthorizationMiddleware, async (req: Request, re
     res.send(email);
 });
 
-router.get('/all', apiKeyAuthorizationMiddleware, async (req: Request, res: Response) => {
+router.get('/all', apiKeyAuthorizationMiddleware(["READ", "WRITE"]), async (req: Request, res: Response) => {
     const { user } = req as Request & { user: IUser };
     const { status, subject, recipient, page = 1, limit = 10 } = req.query;
     const query: FilterQuery<IEmail> = {};

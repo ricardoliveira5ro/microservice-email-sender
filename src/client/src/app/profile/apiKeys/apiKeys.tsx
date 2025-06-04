@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
-import { Plus, CodeXml } from "lucide-react";
+import { Plus, CodeXml, Clipboard } from "lucide-react";
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import toast, { Toaster } from 'react-hot-toast';
 import { KeysAPI } from "@/api/api";
@@ -17,6 +17,7 @@ export default function ApiKeysPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [apiKeys, setApiKeys] = useState<APIKey[] | null>(null);
+    const [generatedKey, setGeneratedKey] = useState<{ authId: string, apiKey: string } | null>(null);
 
     const fetchApiKeys = async () => {
         const data = await KeysAPI.all();
@@ -35,20 +36,23 @@ export default function ApiKeysPage() {
             return;
 
         KeysAPI.generateAPIKey({ name: newAPIKeyName, permission: permission })
-            .then(async () => {
+            .then(async (data) => {
                 toast.success("API Key created");
 
+                setGeneratedKey({ authId: data.authId, apiKey: data.apiKey });
                 await fetchApiKeys();
-        
-                // Reset
-                setIsModalOpen(false);
-                setNewAPIKeyName("");
-                setPermission("READ");
             })
             .catch(() => {
                 toast.error("Could not create API Key");
             });
 
+    }
+
+    function handlePostAPIKeyCreation() {
+        setGeneratedKey(null);
+        setIsModalOpen(false);
+        setNewAPIKeyName("");
+        setPermission("READ");
     }
 
     return (
@@ -65,7 +69,7 @@ export default function ApiKeysPage() {
                 </button>
             </div>
 
-            <Dialog open={isModalOpen} as="div" className="relative z-10 focus:outline-none" onClose={() => setIsModalOpen(false)}>
+            <Dialog open={isModalOpen} as="div" className="relative z-10 focus:outline-none" onClose={handlePostAPIKeyCreation}>
                 <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
                     <div className="flex min-h-full items-center justify-center p-4">
                         <DialogPanel transition className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-closed:transform-[scale(95%)] data-closed:opacity-0">
@@ -73,7 +77,7 @@ export default function ApiKeysPage() {
                                 Create API Key
                             </DialogTitle>
                             <input value={newAPIKeyName} onChange={(e) => setNewAPIKeyName(e.target.value)} type="text" placeholder="Name" className="mt-5 border border-[#34353b] px-3 py-1 rounded-lg w-full" />
-                            <div className="flex gap-x-6 mt-5 w-full radio-button-permission">
+                            <div className="flex gap-x-6 my-5 w-full radio-button-permission">
                                 <label className="flex items-center gap-x-1">
                                     <input type="radio" name="permission" value="READ" checked={permission === "READ"} onChange={(e) => setPermission(e.target.value)} className="accent-[var(--orange)]" />
                                     READ
@@ -83,10 +87,35 @@ export default function ApiKeysPage() {
                                     WRITE
                                 </label>
                             </div>
-                            <div className="flex w-full justify-end gap-x-3 mt-6">
-                                <button onClick={() => setIsModalOpen(false)} className="bg-[#34353b] rounded-lg px-6 py-1.5">Cancel</button>
-                                <button onClick={createAPIKey} className="bg-[var(--orange)] rounded-lg px-6 py-1.5">Create</button>
-                            </div>
+                            {generatedKey ? (
+                                <>
+                                    <hr />
+                                    <div className="flex flex-col mt-4 gap-y-2">
+                                        <span className="text-sm">Auth Id</span>
+                                        <div className="flex justify-between items-center border border-[#34353b] rounded-lg px-3 py-1">
+                                            <span>{generatedKey.authId}</span>
+                                            <button onClick={() => navigator.clipboard.writeText(generatedKey.authId)}>
+                                                <Clipboard size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col mt-4 gap-y-2">
+                                        <span className="text-sm text-[var(--orange)]">This key will only be shown once. Please make sure to copy it now.</span>
+                                        <div className="flex justify-between items-center border border-[#34353b] rounded-lg px-3 py-1">
+                                            <span>{generatedKey.apiKey}</span>
+                                            <button onClick={() => navigator.clipboard.writeText(generatedKey.apiKey)}>
+                                                <Clipboard size={18} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <button onClick={handlePostAPIKeyCreation} className="bg-[var(--orange)] rounded-lg px-6 py-1.5 mt-4">Done</button>
+                                </>
+                            ) : (
+                                <div className="flex w-full justify-end gap-x-3 mt-6">
+                                    <button onClick={() => setIsModalOpen(false)} className="bg-[#34353b] rounded-lg px-6 py-1.5">Cancel</button>
+                                    <button onClick={createAPIKey} className="bg-[var(--orange)] rounded-lg px-6 py-1.5">Create</button>
+                                </div>
+                            )}
                         </DialogPanel>
                     </div>
                 </div>
@@ -96,6 +125,7 @@ export default function ApiKeysPage() {
                 <thead className="bg-[#16171c] text-left">
                     <tr>
                         <th className="w-[300px] px-5 py-2.5 rounded-l-lg">Name</th>
+                        <th className="w-[100px] px-5 py-2.5 text-center">Auth Id</th>
                         <th className="w-[100px] px-5 py-2.5 text-center">Active</th>
                         <th className="w-[200px] px-5 py-2.5">Permission</th>
                         <th className="w-[200px] px-5 py-2.5">Last Used</th>

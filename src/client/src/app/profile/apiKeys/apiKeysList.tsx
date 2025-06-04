@@ -1,6 +1,6 @@
 'use client';
 
-import { Ban, Trash2 } from "lucide-react";
+import { Ban, Clipboard, Trash2 } from "lucide-react";
 import { APIKey } from "@/models/apiKey";
 import { KeysAPI } from "@/api/api";
 
@@ -24,6 +24,11 @@ export default function ApiKeysList({ apiKeys, fetchKeys }: {
             {apiKeys.map((apiKey, index) => (
                 <tr key={index}>
                     <td className="px-5 py-3">{apiKey.name}</td>
+                    <td className="px-5 py-3 flex items-center justify-center">
+                        <button onClick={() => navigator.clipboard.writeText(apiKey.authId)}>
+                            <Clipboard size={22} />
+                        </button>
+                    </td>
                     <td className="px-5 py-3 text-center">
                         <div className="flex items-center justify-center">
                             <span className={`h-[16px] w-[16px] ${apiKey.isActive ? 'bg-green-500' : 'bg-red-500'} rounded-full inline-block`} />

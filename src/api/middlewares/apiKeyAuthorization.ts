@@ -7,7 +7,7 @@ import { IUser } from "../models/user";
 
 import AppError from "../utils/errors/AppError";
 
-export const apiKeyAuthorizationMiddleware = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const apiKeyAuthorizationMiddleware = (requiredPermissions: string[]) => async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { authId, key } = req.query as { authId: string; key: string };
 
     const apiKey = await ApiKey.findById(new ObjectId(authId)).populate('user');
@@ -24,6 +24,11 @@ export const apiKeyAuthorizationMiddleware = async (req: Request, res: Response,
     const isMatch = await bcrypt.compare(key, apiKey.key);
     if (!isMatch) {
         next(new AppError("Invalid API Key", 401));
+        return;
+    }
+
+    if (!requiredPermissions.includes(apiKey.permission)) {
+        next(new AppError("Permission denied", 403));
         return;
     }
 

@@ -25,7 +25,7 @@ router.post('/generateApiKey', [jwtMiddleware, authMiddleware], async (req: Requ
     const { name, permission } = req.body as { name: string, permission: string };
     const { user } = req as Request & { user: IUser };
 
-    const tmpKey = crypto.randomBytes(32).toString("hex");
+    const tmpKey = crypto.randomBytes(16).toString("hex");
     const apiKey = new ApiKey({ name, permission, key: tmpKey, user: user });
 
     await apiKey.save();

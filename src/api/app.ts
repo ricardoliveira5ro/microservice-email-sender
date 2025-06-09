@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import winston from 'winston';
+import expressWinston from 'express-winston';
 
 import userRoutes from './routes/user';
 import emailRoutes from './routes/email';
@@ -15,6 +17,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
+
+// Middleware logging
+app.use(expressWinston.logger({
+    transports: [new winston.transports.Console()],
+    format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.json(),
+    ),
+    msg: "HTTP {{req.method}} {{req.url}}",
+    expressFormat: true,
+    colorize: false,
+}));
 
 // Routes
 app.use('/api/users', userRoutes);

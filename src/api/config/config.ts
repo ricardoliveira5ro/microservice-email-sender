@@ -10,6 +10,10 @@ interface Config {
     redisURL: string;
     recaptchaSiteSecret: string;
     jwtSecret: string;
+    awsAccessKey: string;
+    awsSecretAccessKey: string;
+    awsRegion: string;
+    s3Bucket: string;
 };
 
 const config: Config = {
@@ -20,6 +24,10 @@ const config: Config = {
     redisURL: process.env.REDIS_URL ?? 'redis://127.0.0.1:6379',
     recaptchaSiteSecret: process.env.RECAPTCHA_SITE_SECRET ?? '',
     jwtSecret: process.env.JWT_SECRET ?? '',
+    awsAccessKey: process.env.AWS_ACCESS_KEY ?? '',
+    awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
+    awsRegion: process.env.AWS_REGION ?? '',
+    s3Bucket: process.env.S3_BUCKET_NAME ?? '',
 };
 
 export default config;

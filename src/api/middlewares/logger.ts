@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import winston from "winston";
 import expressWinston from 'express-winston';
-import config from "../config/config";
+import  DailyRotateFile from 'winston-daily-rotate-file';
 import { URL } from 'url';
+import config from "../config/config";
 
 const isProd = config.nodeEnv === 'production';
 
@@ -74,8 +75,10 @@ const formatLoggerResponse = (
 export const logger = expressWinston.logger({
     transports: [
         new winston.transports.Console(),
-        new winston.transports.File({
-            filename: 'logs/application-logs.log',
+        new DailyRotateFile({
+            filename: 'logs/application-logs-%DATE%.log',
+            datePattern: 'MMMM-DD-YYYY',
+            maxFiles: '14d',
         }),
     ],
     format: winston.format.combine(

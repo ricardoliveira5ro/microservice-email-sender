@@ -10,7 +10,7 @@ const sanitizeBody = (body: unknown): unknown => {
     if (!isProd || typeof body !== 'object' || body === null) return body;
 
     const cloned = { ...body } as Record<string, unknown>;
-    if ('password' in cloned) cloned.password = '[REDACTED]';
+    if ('password' in cloned) cloned.password = '********';
     
     return cloned;
 };
@@ -19,7 +19,7 @@ const sanitizeResponse = (body: unknown): unknown => {
   if (!isProd || typeof body !== 'object' || body === null) return body;
 
   const cloned = { ...body } as Record<string, unknown>;
-  if ('apiKey' in cloned) cloned.apiKey = '[REDACTED]';
+  if ('apiKey' in cloned) cloned.apiKey = '********';
   return cloned;
 };
 
@@ -27,7 +27,7 @@ const sanitizeQuery = (query: unknown): unknown => {
     if (!isProd || typeof query !== 'object' || query === null) return query;
 
     const cloned = { ...query } as Record<string, unknown>;
-    if ('key' in cloned) cloned.key = '[REDACTED]';
+    if ('key' in cloned) cloned.key = '********';
     return cloned;
 };
 
@@ -37,7 +37,7 @@ const sanitizeUrl = (originalUrl: string): string => {
     try {
         const urlObj = new URL(originalUrl, 'http://localhost');
         if (urlObj.searchParams.has('key')) {
-        urlObj.searchParams.set('key', '[REDACTED]');
+        urlObj.searchParams.set('key', '********');
         }
         return urlObj.pathname + urlObj.search;
     } catch {
@@ -72,7 +72,12 @@ const formatLoggerResponse = (
 };
 
 export const logger = expressWinston.logger({
-    transports: [new winston.transports.Console()],
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+            filename: 'logs/application-logs.log',
+        }),
+    ],
     format: winston.format.combine(
         winston.format.timestamp({ format: 'MMM-DD-YYYY HH:mm:ss' }),
         winston.format.json(),

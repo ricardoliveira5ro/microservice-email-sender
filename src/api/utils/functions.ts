@@ -16,3 +16,7 @@ export function lastUsageConverter(lastUsage?: Date): string {
     else
         return lastUsage.toISOString().split('T')[0];
 }
+
+export function getDateOnly(date: Date): string{
+    return date.toISOString().replace('T', ' ').slice(0, 19);
+}

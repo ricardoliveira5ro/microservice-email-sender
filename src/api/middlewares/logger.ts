@@ -1,22 +1,30 @@
 import { Request, Response } from "express";
-
 import winston from "winston";
 import expressWinston from 'express-winston';
 
+import { S3DailyTransport } from "../utils/logs/transport";
 import { sanitizeUrl } from "../utils/logs/sanitizers";
-import { dailyFileTransport } from "../utils/logs/transport";
 import { formatLoggerResponse } from "../utils/logs/formatter";
+
+import config from "../config/config";
 
 export const logger = expressWinston.logger({
     transports: [
         new winston.transports.Console(),
-        dailyFileTransport,
+        new S3DailyTransport({
+            bucket: config.s3Bucket,
+            prefix: config.nodeEnv === 'production' ? 'prod/' : 'dev/',
+            accessKeyId: config.awsAccessKey,
+            secretAccessKey: config.awsSecretAccessKey,
+            awsRegion: config.awsRegion,
+            flushIntervalMs: 60000,
+        }),
     ],
     format: winston.format.combine(
-        winston.format.timestamp({ format: 'MMM-DD-YYYY HH:mm:ss' }),
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         winston.format.json(),
         winston.format.printf(({ timestamp, level, message, ...meta }) => {
-            return JSON.stringify({ level, timestamp, message, ...meta });
+            return `[${timestamp as string}] [${message as string}] ${level.toUpperCase()}: ${JSON.stringify(meta)}`;
         }),
     ),
     msg: (req: Request) => `HTTP ${req.method} ${sanitizeUrl(req.originalUrl || req.url)}`,

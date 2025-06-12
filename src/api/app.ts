@@ -8,7 +8,7 @@ import emailRoutes from './routes/email';
 import apiKeysRoutes from './routes/apiKey';
 
 import { errorHandler } from './middlewares/errorHandler';
-import { logger } from './middlewares/logger';
+import { httpLogger } from './middlewares/logger';
 import { startEmailWorker } from './workers/email';
 
 const app = express();
@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Middleware logging
-app.use(logger);
+app.use(httpLogger);
 
 // Routes
 app.use('/api/users', userRoutes);

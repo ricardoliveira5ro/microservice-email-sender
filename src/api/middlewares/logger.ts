@@ -8,18 +8,31 @@ import { formatLoggerResponse } from "../utils/logs/formatter";
 
 import config from "../config/config";
 
-export const logger = expressWinston.logger({
-    transports: [
-        new winston.transports.Console(),
-        new S3DailyTransport({
-            bucket: config.s3Bucket,
-            prefix: config.nodeEnv === 'production' ? 'prod/' : 'dev/',
-            accessKeyId: config.awsAccessKey,
-            secretAccessKey: config.awsSecretAccessKey,
-            awsRegion: config.awsRegion,
-            flushIntervalMs: 60000,
+export const sharedTransports = [
+    new winston.transports.Console(),
+    new S3DailyTransport({
+        bucket: config.s3Bucket,
+        prefix: config.nodeEnv === 'production' ? 'prod/' : 'dev/',
+        accessKeyId: config.awsAccessKey,
+        secretAccessKey: config.awsSecretAccessKey,
+        awsRegion: config.awsRegion,
+        flushIntervalMs: 60000,
+    }),
+];
+
+export const applicationLogger = winston.createLogger({
+    transports: sharedTransports,
+    format: winston.format.combine(
+        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        winston.format.json(),
+        winston.format.printf(({ timestamp, level, message }) => {
+            return `[${timestamp as string}] ${level.toUpperCase()}: ${message as string}`;
         }),
-    ],
+    ),
+});
+
+export const httpLogger = expressWinston.logger({
+    transports: sharedTransports,
     format: winston.format.combine(
         winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         winston.format.json(),

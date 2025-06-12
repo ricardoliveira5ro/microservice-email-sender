@@ -1,11 +1,11 @@
 import { Job, Worker } from "bullmq";
 import { ObjectId } from "mongoose";
 
+import { applicationLogger } from "../middlewares/logger";
 import { redisConnection } from "../queue/connection";
 import sendEmail from "../services/email";
 
 import Email from "../models/email";
-import { getDateOnly } from "../utils/functions";
 
 export function startEmailWorker(): Worker {
     const worker = new Worker('jobQueue', async (job: Job) => {
@@ -26,11 +26,11 @@ export function startEmailWorker(): Worker {
     });
 
     worker.on('completed', (job: Job) => {
-        console.log(`[${getDateOnly(new Date)}] INFO: Job ${job.id ?? 'unknown'} completed successfully`);
+        applicationLogger.info(`Job ${job.id ?? 'unknown'} completed successfully`);
     });
 
     worker.on('failed', (job, err) => {
-        console.error(`[${getDateOnly(new Date)}] ERROR: Job ${job?.id ?? 'unknown'} failed`, err);
+        applicationLogger.error(`Job ${job?.id ?? 'unknown'} failed`, { err });
     });
 
     return worker;

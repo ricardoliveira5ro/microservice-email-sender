@@ -50,10 +50,10 @@ export class S3DailyTransport extends Transport {
     log(info: unknown, callback: () => void): void {
         setImmediate(() => this.emit('logged', info)); // Winston listens for this to know the log has been handled successfully
 
-        const { level, timestamp } = info as { level: string, timestamp: string };
+        const { level, timestamp, message } = info as { level: string, timestamp: string, message: string };
 
-        const line = JSON.stringify(info);
-        this.buffer.push(`[${timestamp}] ${level.toUpperCase()}: ${line}`); // Add new log to collection
+        const line = `[${timestamp}] ${message ? `[${message}]` : ''} ${level.toUpperCase()}: ${JSON.stringify(info)}`;
+        this.buffer.push(line); // Add new log to collection
         callback(); // Tells Winston that the log entry has been processed and it can continue
     }
 

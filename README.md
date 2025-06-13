@@ -14,9 +14,24 @@ This API is ideal for integrating email functionality into your application, whe
 - **User Authentication**: Secure registration and login system with token-based authentication.
 - **API Key Management**: Generate, revoke, and manage API Keys with read-write permissions 
 - **Send or Schedule Emails**: Instantly send emails or schedule them for a future time
-- **Email Tracking**: Inspect the status of individual emails.
+- **Email Tracking**: Check the status of individual emails.
 - **Advanced Filtering**: Retrieve a list of email requests with filters for:
     - Status
     - Subject
     - Recipient email address
     - Pagination support with page and size parameters
+
+### 📘 API Usage
+
+Full API usage documentation is available here: [API Docs](./src/api/APIDocs.md)
+
+### 💻 Technical Details
+
+Here you can find the technical documentation for each part of the project.
+
+- [Frontend Documentation](./src/client/README.md)
+- [Backend Documentation](./src/api/README.md)
+
+### 🫱🏼‍🫲🏼 Contribute
+
+PRs and issues welcome.

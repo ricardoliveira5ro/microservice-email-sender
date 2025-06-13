@@ -16,7 +16,7 @@ export default function Home() {
               <span>Get Started</span>
               <ChevronRight size={20} />
             </Link>
-            <a href="https://github.com/ricardoliveira5ro/microservice-email-sender/blob/main/README.md" className="flex items-center gap-x-1" target="_blank" rel="noopener noreferrer">
+            <a href="https://github.com/ricardoliveira5ro/microservice-email-sender/blob/main/src/api/APIDocs.md" className="flex items-center gap-x-1" target="_blank" rel="noopener noreferrer">
               <span>Documentation</span>
               <ChevronRight size={20} />
             </a>

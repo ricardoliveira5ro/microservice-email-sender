@@ -42,7 +42,7 @@ emailSchema.methods.toJSON = function (this: Document & IEmail): object {
 
     return {
         _id,
-        status,
+        status: status || 'in progress',
         lastUpdateTime: timestamp ? new Date(timestamp * 1000).toISOString() : new Date().toISOString(),
         bounceCategory: bounceCategory || 'N.A.',
         response: response || 'N.A.',

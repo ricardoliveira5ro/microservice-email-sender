@@ -8,7 +8,7 @@ All the calls to the API should be using this instance `https://email-sender.sol
 
 Should get a `200 OK` response like this:
 
-```
+```json
 {
     "uptime": 1463.950320013,
     "message": "OK",
@@ -22,7 +22,7 @@ Should get a `200 OK` response like this:
 
 Request body:
 
-```
+```json
 {
     "recipients": [
         {
@@ -42,7 +42,7 @@ Request body:
 
 Should get a `200 OK` response like this:
 
-```
+```json
 {
     "_id": "[EMAIL_ID]",
     "status": "delivery",
@@ -65,4 +65,4 @@ There are other query parameters to restrict the number of results:
 - `page`: Page number
 - `size`: Items per page (default: 10)
 
-Should get a `200 OK` response with an array of emails:
+Should get a `200 OK` response with an array of emails

@@ -74,8 +74,10 @@ This document covers the internal structure, technologies, and development guide
 
 ### 📃 Logging
 
-- Console
-- Logs are batched and flushed to a file every 60 seconds, then uploaded to an AWS S3 bucket
+The application uses Winston for structured logging across all environments.
+
+- Logs are written to the console and directly streamed to a file in an AWS S3 bucket
+- Log entries are batched and flushed every 60 seconds
 
 ### 🚀 Deployment
 

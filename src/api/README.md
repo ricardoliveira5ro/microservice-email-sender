@@ -1,6 +1,6 @@
 # Backend Documentation
 
-This document covers the internal structure, technologies, and development guidelines for the Email Sender Service backend
+This document covers the internal structure, technologies, and development guidelines for the **Email Sender Service** backend
 
 ### ⚙️ Tech Stack
 
@@ -29,7 +29,7 @@ This document covers the internal structure, technologies, and development guide
 │   ├── 📂 errors/          # Custom error classes
 │   ├── 📂 logs/            # Winston formatters, transports, and sanitizers
 │   └── 📄 functions.ts     # Reusable utility functions
-├── 📂 validators/          # Zod input schemas validators
+├── 📂 validators/          # Zod input schema validators
 ├── 📂 workers/             # BullMQ workers for email processing
 ├── 📄 app.ts               # Express app setup  
 └── 📄 server.ts            # Server entry point 
@@ -46,3 +46,40 @@ This document covers the internal structure, technologies, and development guide
 - API Key Auth
     - Used to authenticate requests to emails/ endpoints.
     - Keys can be scoped to read or write.
+
+### 📬 Email Flow
+
+1. Incoming Request to /emails/send-email
+2. Auth Middleware checks `authId` + `key` and its permissions
+3. Validation request body
+4. Add email to job queue
+5. Service either sends immediately or schedules
+6. Email Status is tracked and stored in database
+
+### 🗂️ Models
+
+- **User**: Stores username, email, password hash and tokens.
+- **APIKey**: Stores generated keys, permission scopes, and status
+- **Email**: Stores sender, email content, recipients, subject, category, delivery status and Mailtrap payload.
+
+### 🛡️ Middlewares
+
+- `apiKeyAuthorizationMiddleware`: Validates API Key and permission scope
+- `jwtMiddleware`: Reconstructs cookies into auth token and sets it as authorization request header
+- `authMiddleware`: Decodes and verifies the token to identify the user
+- `errorHandler`: Centralized error processor that formats, maps, and handles known errors based on environment and type
+- `resetMiddleware`: Decode reset-token from database to verify its authenticity
+- `applicationLogger` & `httpLogger`: Application and route logger
+- `reCaptchaMiddleware`: Validates reCAPTCHA value
+
+### 📃 Logging
+
+- Console
+- Logs are batched and flushed to a file every 60 seconds, then uploaded to an AWS S3 bucket
+
+### 🚀 Deployment
+
+- The server handles both API endpoints and serves the frontend static build
+- **Database** → MongoDB Atlas
+- **App Hosting** → Render
+- **Queue & Jobs** → Redis Cloud (used with BullMQ)

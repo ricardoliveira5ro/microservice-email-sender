@@ -6,6 +6,7 @@ import { BSONError } from 'bson';
 
 import AppError from '../utils/errors/AppError';
 import config from '../config/config';
+import { applicationLogger } from './logger';
 
 const developmentError = (err: Error, res: Response): void => {
     res.status((err instanceof AppError) ? err.status : 500).send({
@@ -56,6 +57,8 @@ const requestValidationError = (err: ZodError): AppError => {
 const invalidIdError = (): AppError => new AppError('Invalid ID', 400);
 
 export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction): void => {
+    applicationLogger.error(err.stack ?? err.message);
+
     if (err instanceof MongoServerError) err = databaseError(err);
     if (err instanceof MongooseError.ValidationError) err = validationError(err);
     if (err instanceof ZodError) err = requestValidationError(err);

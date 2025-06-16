@@ -9,6 +9,8 @@ import apiKeysRoutes from './routes/apiKey';
 
 import { errorHandler } from './middlewares/errorHandler';
 import { httpLogger } from './middlewares/logger';
+import { limiter } from './middlewares/rateLimiter';
+
 import { startEmailWorker } from './workers/email';
 
 const app = express();
@@ -17,7 +19,10 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Middleware logging
+// Rate Limiter
+app.use(limiter);
+
+// HTTP Logger
 app.use(httpLogger);
 
 // Routes

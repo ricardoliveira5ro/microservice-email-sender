@@ -12,6 +12,7 @@ This document covers the internal structure, technologies, and development guide
 - **Email Provider** → Mailtrap
 - **Logging** → Winston + ExpressWinston
 - **Input Validation** → Zod (schemas) + Validator (low-level) + Luxon (date handling)
+- **Rate Limiting** → express-rate-limit
 
 ### 📁 Project Structure
 
@@ -71,6 +72,7 @@ This document covers the internal structure, technologies, and development guide
 - `resetMiddleware`: Decode reset-token from database to verify its authenticity
 - `applicationLogger` & `httpLogger`: Application and route logger
 - `reCaptchaMiddleware`: Validates reCAPTCHA value
+- `limiter`: Rate Limiter
 
 ### 📃 Logging
 
